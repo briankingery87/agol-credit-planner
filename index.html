@@ -592,9 +592,73 @@ FCS = [
   </div>
 </section>
 
+
 <!-- 5 -->
+<section id="sec-advice">
+  <h2><span class="num">05</span> What to do about it</h2>
+  <div class="h2rule"></div>
+  <div class="sub two">
+    <p>Section 04 says what the plan costs. This one says what to buy. There are only two levers:
+       purchase more credits, or move feature storage out of the credit model onto a Premium feature
+       data store and pay a fixed subscription instead. Both are priced below against the same
+       scenario, so the comparison is like for like.</p>
+    <p>Credits are sold in blocks of 1,000 and you cannot buy a partial block, so the figures below
+       round up to whole blocks. Each option covers only the shortfall that its own configuration
+       leaves behind: moving to Premium removes feature storage from the burn first, then buys
+       credits for whatever is still uncovered.</p>
+  </div>
+  <div class="grid2">
+    <div class="panel">
+      <h3>Every option, priced over the horizon</h3>
+      <p class="ph">Subscription cost plus whatever credits you would still have to buy, per subscription year, summed across the horizon.</p>
+      <table class="ref tiers" id="advTable"><tbody></tbody></table>
+      <p id="advNote" style="font-size:12.5px;color:var(--dim-2);margin:13px 0 0"></p>
+    </div>
+    <div class="panel">
+      <h3>Recommendation</h3>
+      <p class="ph">Cheapest option that actually holds your data.</p>
+      <div id="advVerdict"></div>
+    </div>
+  </div>
+  <div class="band" style="margin-top:16px;border-left-color:var(--accent)">
+    <strong>What this does not decide for you.</strong>
+    It is a cost comparison, and cost is not the only reason to move. Premium buys dedicated database
+    compute, which is the right call when heavy query, edit or ETL loads are the problem even if
+    credits would be cheaper. It also buys predictable billing, which some budgets value more than a
+    lower number. Going the other way, purchased credits expire two years after purchase and unused
+    subscription credits expire at the end of each term, so buying several years of headroom in one
+    go can cost more than it saves. Treat the recommendation as the budget answer and make the
+    performance call separately.
+  </div>
+</section>
+
+<!-- 6 -->
+<section id="sec-scenario" class="noprint">
+  <h2><span class="num">06</span> Save, share, reuse</h2>
+  <div class="h2rule"></div>
+  <div class="sub two">
+    <p>Your scenario is kept in this browser automatically. Export it to a JSON file to version it
+       with a project, send it to someone else, or come back to a comparison you ran months ago.
+       Importing replaces everything currently on the page.</p>
+    <p>The text summary is plain text with the rates and assumptions attached, sized to drop straight
+       into an email or a proposal appendix without reformatting. Print produces a clean page with
+       the charts and tables and the controls stripped out.</p>
+  </div>
+  <div class="btnrow" style="margin-top:0">
+    <button onclick="copySummary()">Copy text summary</button>
+    <button onclick="exportJSON()">Export scenario</button>
+    <button class="ghost" onclick="document.getElementById('imp').click()">Import scenario</button>
+    <input type="file" id="imp" accept=".json,application/json" style="display:none" onchange="importJSON(this)">
+    <button class="ghost" onclick="window.print()">Print or save as PDF</button>
+    <span class="sep"></span>
+    <button class="ghost" onclick="resetAll()">Reset to defaults</button>
+    <span class="msg" id="msg"></span>
+  </div>
+</section>
+
+<!-- 7 -->
 <section id="sec-reference">
-  <h2><span class="num">05</span> Published rates and reference values</h2>
+  <h2><span class="num">07</span> Published rates and reference values</h2>
   <div class="h2rule"></div>
   <div class="sub two">
     <p>The left table is Esri's published credit consumption, used unchanged by this tool. It comes
@@ -651,30 +715,6 @@ FCS = [
     Turn on Enable Sync and change tracking only where offline or editing is a real requirement,
     because both grow the stored size over time. And delete or archive superseded content, since
     storage is charged hourly and stops the moment the item is gone.
-  </div>
-</section>
-
-<!-- 6 -->
-<section id="sec-scenario" class="noprint">
-  <h2><span class="num">06</span> Save, share, reuse</h2>
-  <div class="h2rule"></div>
-  <div class="sub two">
-    <p>Your scenario is kept in this browser automatically. Export it to a JSON file to version it
-       with a project, send it to someone else, or come back to a comparison you ran months ago.
-       Importing replaces everything currently on the page.</p>
-    <p>The text summary is plain text with the rates and assumptions attached, sized to drop straight
-       into an email or a proposal appendix without reformatting. Print produces a clean page with
-       the charts and tables and the controls stripped out.</p>
-  </div>
-  <div class="btnrow" style="margin-top:0">
-    <button onclick="copySummary()">Copy text summary</button>
-    <button onclick="exportJSON()">Export scenario</button>
-    <button class="ghost" onclick="document.getElementById('imp').click()">Import scenario</button>
-    <input type="file" id="imp" accept=".json,application/json" style="display:none" onchange="importJSON(this)">
-    <button class="ghost" onclick="window.print()">Print or save as PDF</button>
-    <span class="sep"></span>
-    <button class="ghost" onclick="resetAll()">Reset to defaults</button>
-    <span class="msg" id="msg"></span>
   </div>
 </section>
 
@@ -998,13 +1038,16 @@ function calc(){
   }
   const avail = availableAnnual();
 
-  // cumulative within subscription year
-  let cum = 0, exhaust = null, yearTotals = [];
+  // cumulative within subscription year. yearStd keeps feature storage in the credit
+  // model, yearNoFeat takes it out, which is what a Premium feature data store does.
+  let cum = 0, exhaust = null, yearTotals = [], yearStd = [], yearNoFeat = [];
   series.forEach((p,idx)=>{
     if(idx % 12 === 0) cum = 0;
     cum += p.total; p.cum = cum;
     const y = Math.floor(idx/12);
     yearTotals[y] = (yearTotals[y]||0) + p.total;
+    yearStd[y]    = (yearStd[y]||0)    + p.fRaw + p.fl + p.im + p.t;
+    yearNoFeat[y] = (yearNoFeat[y]||0) + p.fl + p.im + p.t;
     if(exhaust === null && cum > avail) exhaust = idx+1;
   });
 
@@ -1052,6 +1095,7 @@ function calc(){
   + '<td style="font-weight:650;border-top:1px solid var(--accent)">'+fmt(totF,0)+' credits &nbsp; $'+fmt(stdCost,0)+'</td></tr>';
 
   renderTiers(stdCost, months, price, featMB1);
+  renderAdvice(yearStd, yearNoFeat, months, price, avail, featMB1);
 
   chartData = {series, avail, months, price, exhaust};
   drawChart1(); drawChart2();
@@ -1129,6 +1173,109 @@ function renderTiers(stdCost, months, price, featMB1){
   }
   vd.innerHTML = where + verdict;
 }
+/* Esri sells credits only in blocks of 1,000, with no partial block, so every
+   shortfall rounds up to a whole block. */
+const CREDIT_BLOCK = 1000;
+
+function renderAdvice(yearStd, yearNoFeat, months, price, avail, featMB1){
+  const tb = document.querySelector("#advTable tbody");
+  const vd = document.getElementById("advVerdict");
+  const nt = document.getElementById("advNote");
+  if(!tb || !vd) return;
+
+  const featGB  = featMB1/1024;
+  const years   = Math.max(1, Math.ceil(months/12));
+  const shortOf = arr => arr.reduce((a,y)=>a+Math.max(0,(y||0)-avail), 0);
+  const blocksOf = c => Math.ceil(Math.max(0,c)/CREDIT_BLOCK);
+
+  const shortStd  = shortOf(yearStd);
+  const shortPrem = shortOf(yearNoFeat);
+
+  const opts = [{
+    key:"std", name:"Stay on Standard", short:"staying on Standard", note:"buy credits to cover the gap",
+    sub:0, blocks:blocksOf(shortStd), viable:featGB <= 500,
+    block:featGB > 500 ? "past the 500 GB Standard ceiling" : ""
+  }];
+  TIERS.forEach(([k,label,note,listPrice,capTB])=>{
+    const mo = S.fds[k]||0;
+    opts.push({
+      key:k, name:"Move to "+label, short:label, note:capTB+" TB, "+note,
+      sub:mo*months, blocks:blocksOf(shortPrem), viable:featGB <= capTB*1024,
+      block:featGB > capTB*1024 ? ("past "+label+"'s "+capTB+" TB capacity") : ""
+    });
+  });
+  opts.forEach(o=>{ o.credits = o.blocks*CREDIT_BLOCK*price; o.cost = o.sub + o.credits; });
+
+  const viable = opts.filter(o=>o.viable);
+  const win = viable.length ? viable.reduce((a,b)=>b.cost < a.cost ? b : a) : null;
+  const runnerUp = viable.length > 1
+    ? viable.filter(o=>o !== win).reduce((a,b)=>b.cost < a.cost ? b : a) : null;
+
+  let html = '<tr><th>Option</th><th class="num">Credit blocks</th><th class="num">Cost over '+months+' months</th></tr>';
+  opts.forEach(o=>{
+    const isWin = win && o === win;
+    const style = o.viable ? (isWin ? ' style="background:var(--row-hover)"' : '') : ' style="opacity:.55"';
+    html += '<tr'+style+'><td><strong>'+o.name+'</strong>'
+          + (isWin ? ' <span style="color:var(--good);font-weight:650">&#10003; cheapest</span>' : '')
+          + '<br><span style="color:var(--dim-2)">'+(o.block || o.note)+'</span></td>'
+          + '<td class="num">'+(o.viable ? (o.blocks ? o.blocks+' &times; 1,000' : 'none') : '-')+'</td>'
+          + '<td class="num">'+(o.viable ? '$'+fmt(o.cost,0) : '<span style="color:var(--dim-2)">not viable</span>')
+          + (o.viable && o.sub ? '<br><span style="color:var(--dim-2)">$'+fmt(o.sub,0)+' subscription'
+              + (o.credits ? ' + $'+fmt(o.credits,0)+' credits' : '')+'</span>'
+            : '')+'</td></tr>';
+  });
+  tb.innerHTML = html;
+
+  const tight = Math.max(...yearStd.map(y=>y||0));
+  nt.innerHTML = "Tightest subscription year on Standard is " + fmt(tight,0) + " credits against "
+    + fmt(avail,0) + " available. " + (years > 1 ? "Shortfalls are summed across all " + years + " subscription years, because unused credits do not carry over. " : "")
+    + "This accounts for your included credits, so the crossover here sits a little above the raw break-even in section 04.";
+
+  if(!win){
+    vd.innerHTML = '<p style="margin:0;font-size:14px"><strong>Nothing here holds this much data.</strong></p>'
+      + '<p style="margin:10px 0 0;color:var(--dim);font-size:13px">You are modeling '+fmtSize(featMB1)
+      + ' of feature data, past M4 at 4 TB. Split the content across organizations, move the largest layers to a'
+      + ' referenced enterprise data store, or talk to Esri about options above M4.</p>';
+    return;
+  }
+
+  const lead = win.blocks
+    ? (win.key === "std"
+        ? "Buy " + win.blocks + " block" + (win.blocks>1?"s":"") + " of 1,000 credits and stay on Standard."
+        : "Move to " + win.short + " and buy " + win.blocks + " block" + (win.blocks>1?"s":"") + " of 1,000 credits.")
+    : (win.key === "std"
+        ? "Buy nothing. Your included credits cover this plan."
+        : "Move to " + win.short + ". No credit purchase needed on top of it.");
+
+  let bullets = [];
+  if(win.cost > 0){
+    bullets.push(win.sub && win.credits
+      ? "<strong>$" + fmt(win.cost,0) + "</strong> over " + months + " months: $" + fmt(win.sub,0)
+        + " of subscription plus $" + fmt(win.credits,0) + " of credits."
+      : win.sub
+      ? "<strong>$" + fmt(win.cost,0) + "</strong> of subscription over " + months + " months, with no credit purchase on top."
+      : "<strong>$" + fmt(win.cost,0) + "</strong> of credits over " + months + " months.");
+  }
+  if(runnerUp){
+    const gap = runnerUp.cost - win.cost;
+    bullets.push("Next cheapest is <strong>" + runnerUp.short + "</strong> at $"
+      + fmt(runnerUp.cost,0) + ", " + (gap > 0 ? "$" + fmt(gap,0) + " more" : "the same") + ".");
+  }
+  if(win.key === "std" && featGB > 100){
+    bullets.push("Feature storage is " + fmtSize(featMB1) + ". Re-run this once it grows, because the Premium levels overtake credits as it climbs.");
+  }
+  if(win.key !== "std"){
+    bullets.push("Premium also removes feature storage from the credit model entirely, so credit spend stops tracking how much you host.");
+  }
+  if(!win.blocks && win.key === "std"){
+    bullets.push("Headroom in the tightest year is " + fmt(avail-tight,0) + " credits.");
+  }
+
+  vd.innerHTML = '<p style="margin:0;font-size:14.5px;font-weight:650;letter-spacing:-.01em">'+lead+'</p>'
+    + '<ul style="margin:12px 0 0;padding-left:17px;color:var(--dim);font-size:13px;line-height:1.6">'
+    + bullets.map(b=>'<li style="margin-bottom:6px">'+b+'</li>').join('') + '</ul>';
+}
+
 function copyCode(btn){
   const pre = btn.closest(".codewrap").querySelector("pre");
   const txt = pre.textContent;
