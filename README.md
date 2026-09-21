@@ -27,8 +27,9 @@ browser. Scenarios are kept in `localStorage` and can be exported to JSON.
 - Recommends what to actually buy. Prices staying on Standard and buying credit blocks against
   moving to each Premium level, per subscription year across the horizon, rules out any option
   that cannot hold the data, and names the cheapest one.
-- Round-trips real measurements. An ArcGIS Pro snippet prints one line per feature class; pasting
-  those lines back into the page creates rows with your measured feature, vertex and field counts.
+- Round-trips real measurements. The Scope data button opens a side panel with an ArcGIS Pro
+  snippet that prints one line per feature class; pasting those lines back creates rows with your
+  measured feature, vertex and field counts.
 - Uses the same series colors as the ArcGIS Online organization status dashboard, so the planner's
   charts and your real usage charts read as one set.
 

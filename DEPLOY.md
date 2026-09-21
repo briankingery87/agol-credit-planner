@@ -28,8 +28,10 @@ const AUTHOR = {
 ```
 
 **4. Verify locally.** Open `index.html` in a browser. It was tested headless at 390, 768 and
-1400 px with no console errors, but confirm on your machine: photo and logo render, the KPI strip
-fills in, both charts draw on first paint, and hovering either chart updates the readout under it.
+1400 px with no console errors, but confirm on your machine: the byline photo and logo render in the
+header, the KPI strip in section 04 fills in, both charts draw on first paint, hovering either chart
+updates the readout under it, the Copy script button reports Copied, and pasting a PLANNER line into
+section 02 adds a row.
 
 **5. Initialize and push.**
 
@@ -83,7 +85,7 @@ commits instead of one. Do this before step 5's single commit, not after.
 git init
 git branch -M main
 
-git add LICENSE README.md .nojekyll
+git add LICENSE README.md .nojekyll .gitignore
 git commit -m "Scaffold: license, readme, Pages config"
 
 git add index.html

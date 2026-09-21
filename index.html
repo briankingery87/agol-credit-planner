@@ -122,6 +122,27 @@ textarea{width:100%;font:12px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,mo
 .codebar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 7px}
 .codebar .lbl{font-size:11px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:var(--dim-2)}
 .codebar button{padding:4px 10px;font-size:12px}
+
+/* slide-out scope panel */
+.scrim{position:fixed;inset:0;background:rgba(21,32,43,.34);z-index:60;
+  opacity:0;pointer-events:none;transition:opacity .18s}
+.scrim.on{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;height:100%;width:min(600px,100%);z-index:61;
+  background:var(--panel);border-left:1px solid var(--line);
+  box-shadow:-16px 0 44px rgba(21,32,43,.16);
+  transform:translateX(101%);transition:transform .22s ease;
+  display:flex;flex-direction:column;visibility:hidden}
+.drawer.on{transform:none;visibility:visible}
+.drawer-hd{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;
+  padding:19px 22px 15px;border-bottom:1px solid var(--line);flex:none}
+.drawer-hd h3{margin:0;font-size:15.5px;font-weight:650;letter-spacing:-.01em}
+.drawer-hd p{margin:6px 0 0;font-size:12.5px;color:var(--dim);max-width:46ch}
+.drawer-x{flex:none;border:none;background:none;color:var(--dim-2);
+  font-size:23px;line-height:1;padding:1px 7px;cursor:pointer;border-radius:3px}
+.drawer-x:hover{background:var(--panel-2);color:var(--text);border-color:transparent}
+.drawer-body{padding:19px 22px 34px;overflow-y:auto;flex:1;min-height:0}
+.drawer-body pre{font-size:11.5px}
+@media (prefers-reduced-motion:reduce){.drawer,.scrim{transition:none}}
 input:focus,select:focus,button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 input[readonly]{background:#eef1f5;color:var(--dim)}
 input[disabled],select[disabled]{opacity:.35}
@@ -385,8 +406,9 @@ footer strong{color:var(--dim)}
        tile caches, packages, documents and attachments are billed on their file size instead, so
        enter those directly in GB.</p>
     <p>Hover any column heading for what it means and where the number comes from. The presets are
-       starting points drawn from typical production data, not measurements of yours. The panel
-       below the table replaces them with your own measured values in about two minutes.</p>
+       starting points drawn from typical production data, not measurements of yours. Scope data,
+       in the buttons below the table, replaces them with your own measured values in about two
+       minutes.</p>
   </div>
   <div class="scroller">
   <table id="layers">
@@ -412,7 +434,8 @@ footer strong{color:var(--dim)}
   </table>
   </div>
   <div class="btnrow noprint">
-    <button onclick="addRow()">Add item</button>
+    <button onclick="addRow()">Add new row</button>
+    <button onclick="openScope()" aria-haspopup="dialog">Scope data</button>
     <span class="sep"></span>
     <span style="font-size:12px;color:var(--dim-2);margin-right:2px">Presets</span>
     <span id="presetBtns"></span>
@@ -420,83 +443,15 @@ footer strong{color:var(--dim)}
     <button class="ghost" onclick="clearRows()">Clear all</button>
   </div>
 
-  <div class="panel" style="margin-top:16px">
-    <h3>Measure your own geometry, then load it straight in</h3>
-    <p class="ph">Two steps. Run the script in the ArcGIS Pro Python window, then paste the PLANNER lines it prints into the box on the right. Each line becomes a row in the table above with your real feature count, mean vertex count and field count already filled in.</p>
-    <div class="grid2">
-      <div class="codewrap">
-        <div class="codebar">
-          <span class="lbl">Step 1 &middot; ArcGIS Pro Python window</span>
-          <button class="ghost noprint" onclick="copyCode(this)">Copy script</button>
-        </div>
-<pre><span class="c"># Measure feature classes for the AGOL Credit Planner.</span>
-<span class="c"># Copy the PLANNER lines from the output and paste them</span>
-<span class="c"># into the planner, section 02.</span>
-<span class="k">import</span> arcpy, statistics
-
-FCS = [
-    r<span class="s">"C:\data\Base.gdb\Parcels"</span>,
-    <span class="c"># add more feature classes here</span>
-]
-
-<span class="k">for</span> fc <span class="k">in</span> FCS:
-    name = arcpy.Describe(fc).baseName
-    v = [r[0].pointCount <span class="k">for</span> r
-         <span class="k">in</span> arcpy.da.SearchCursor(fc, [<span class="s">"SHAPE@"</span>])
-         <span class="k">if</span> r[0]]
-    f = [x <span class="k">for</span> x <span class="k">in</span> arcpy.ListFields(fc)
-         <span class="k">if</span> x.type <span class="k">not in</span> (<span class="s">"OID"</span>, <span class="s">"Geometry"</span>)
-         <span class="k">and</span> x.name.lower() <span class="k">not in</span>
-         (<span class="s">"shape_length"</span>, <span class="s">"shape_area"</span>)]
-    <span class="k">if not</span> v:
-        <span class="k">print</span>(name, <span class="s">"has no geometry, skipped"</span>)
-        <span class="k">continue</span>
-    <span class="k">print</span>(<span class="s">"{}  features {:,}  mean {:.1f}  "</span>
-          <span class="s">"median {:.0f}  max {:,}  fields {}"</span>.format(
-          name, <span class="k">len</span>(v), statistics.mean(v),
-          statistics.median(v), <span class="k">max</span>(v), <span class="k">len</span>(f)))
-    <span class="k">print</span>(<span class="s">"PLANNER|{}|{}|{:.1f}|{}"</span>.format(
-          name, <span class="k">len</span>(v), statistics.mean(v), <span class="k">len</span>(f)))</pre>
-        <p style="font-size:12px;color:var(--dim-2);margin:11px 0 0">
-          The readable line is for you: a layer whose mean sits far above its median has a handful of
-          very dense shapes carrying the storage, and generalizing just those is usually the cheapest
-          optimization available. The PLANNER line is for the box on the right.
-        </p>
-      </div>
-      <div class="codewrap noprint">
-        <div class="codebar">
-          <span class="lbl">Step 2 &middot; paste the output back</span>
-          <button class="ghost" onclick="pasteMeasured()">Clear</button>
-        </div>
-        <textarea id="measIn" rows="9" spellcheck="false" aria-label="Paste PLANNER lines from the ArcGIS Pro script"
-          placeholder="PLANNER|Parcels|45000|24.3|28&#10;PLANNER|Roads|30000|41.7|20"></textarea>
-        <div class="btnrow" style="margin-top:9px">
-          <button onclick="importMeasured()">Add as layer rows</button>
-          <span class="msg" id="measMsg"></span>
-        </div>
-        <p style="font-size:12.5px;color:var(--dim);margin:14px 0 0">
-          Lines are <code>PLANNER|name|features|mean vertices|attribute fields</code>. Paste as many as
-          you measured; the script prints one per feature class. Rows land in the table above as Feature
-          type with growth and sync off, so set those yourself for anything being actively collected.
-        </p>
-        <p style="font-size:12.5px;color:var(--dim);margin:14px 0 0">
-          Measuring replaces the two inputs the presets are most often wrong about. It does not verify
-          the byte assumptions listed below, so after you publish one of these layers, compare its real
-          size on the organization status dashboard against the modeled size in the table. If they are
-          far apart, the assumptions need revisiting, not your measurements.
-        </p>
-      </div>
-    </div>
-  </div>
   <div class="band" style="margin-top:16px">
     <strong>What the modeled size is built from.</strong>
     Esri publishes credits per megabyte, not megabytes per feature, so the size column is an
     engineering estimate rather than a published figure: 16 bytes per vertex (two 8-byte doubles),
     24 bytes per attribute value, 48 bytes of row overhead, then 1.60x for indexes and storage
     structures and a further 1.70x where sync is on. Those are reasonable working numbers, not an
-    authority. Measure your geometry above to fix the vertex and field counts, and check one
-    published layer against your organization status dashboard before a number here goes into a
-    budget, a proposal or a client conversation.
+    authority. Use Scope data above to fix the vertex and field counts from your own geometry, and
+    check one published layer against your organization status dashboard before a number here goes
+    into a budget, a proposal or a client conversation.
   </div>
 </section>
 
@@ -748,6 +703,83 @@ FCS = [
 </footer>
 
 </div>
+
+<div class="scrim noprint" id="scopeScrim" onclick="closeScope()"></div>
+<aside class="drawer noprint" id="scopeDrawer" role="dialog" aria-modal="true"
+       aria-labelledby="scopeTitle" aria-hidden="true">
+  <div class="drawer-hd">
+    <div>
+      <h3 id="scopeTitle">Scope your data</h3>
+      <p>Measure real geometry in ArcGIS Pro, then load it straight into the table. Each line you
+         paste back becomes a row with your own feature count, mean vertex count and field count.</p>
+    </div>
+    <button class="drawer-x" onclick="closeScope()" aria-label="Close">&times;</button>
+  </div>
+  <div class="drawer-body">
+    <div class="codewrap">
+      <div class="codebar">
+          <span class="lbl">Step 1 &middot; run in the ArcGIS Pro Python window</span>
+          <button class="ghost noprint" onclick="copyCode(this)">Copy script</button>
+        </div>
+<pre><span class="c"># Measure feature classes for the AGOL Credit Planner.</span>
+<span class="c"># Copy the PLANNER lines from the output and paste them</span>
+<span class="c"># into the planner, section 02.</span>
+<span class="k">import</span> arcpy, statistics
+
+FCS = [
+    r<span class="s">"C:\data\Base.gdb\Parcels"</span>,
+    <span class="c"># add more feature classes here</span>
+]
+
+<span class="k">for</span> fc <span class="k">in</span> FCS:
+    name = arcpy.Describe(fc).baseName
+    v = [r[0].pointCount <span class="k">for</span> r
+         <span class="k">in</span> arcpy.da.SearchCursor(fc, [<span class="s">"SHAPE@"</span>])
+         <span class="k">if</span> r[0]]
+    f = [x <span class="k">for</span> x <span class="k">in</span> arcpy.ListFields(fc)
+         <span class="k">if</span> x.type <span class="k">not in</span> (<span class="s">"OID"</span>, <span class="s">"Geometry"</span>)
+         <span class="k">and</span> x.name.lower() <span class="k">not in</span>
+         (<span class="s">"shape_length"</span>, <span class="s">"shape_area"</span>)]
+    <span class="k">if not</span> v:
+        <span class="k">print</span>(name, <span class="s">"has no geometry, skipped"</span>)
+        <span class="k">continue</span>
+    <span class="k">print</span>(<span class="s">"{}  features {:,}  mean {:.1f}  "</span>
+          <span class="s">"median {:.0f}  max {:,}  fields {}"</span>.format(
+          name, <span class="k">len</span>(v), statistics.mean(v),
+          statistics.median(v), <span class="k">max</span>(v), <span class="k">len</span>(f)))
+    <span class="k">print</span>(<span class="s">"PLANNER|{}|{}|{:.1f}|{}"</span>.format(
+          name, <span class="k">len</span>(v), statistics.mean(v), <span class="k">len</span>(f)))</pre>
+        <p style="font-size:12px;color:var(--dim-2);margin:11px 0 0">
+          The readable line is for you: a layer whose mean sits far above its median has a handful of
+          very dense shapes carrying the storage, and generalizing just those is usually the cheapest
+          optimization available. The PLANNER line is for the box below.
+        </p>
+    </div>
+    <div class="codewrap" style="margin-top:22px">
+      <div class="codebar">
+          <span class="lbl">Step 2 &middot; paste the PLANNER lines back</span>
+          <button class="ghost" onclick="pasteMeasured()">Clear</button>
+        </div>
+        <textarea id="measIn" rows="9" spellcheck="false" aria-label="Paste PLANNER lines from the ArcGIS Pro script"
+          placeholder="PLANNER|Parcels|45000|24.3|28&#10;PLANNER|Roads|30000|41.7|20"></textarea>
+        <div class="btnrow" style="margin-top:9px">
+          <button onclick="importMeasured()">Add as layer rows</button>
+          <span class="msg" id="measMsg"></span>
+        </div>
+        <p style="font-size:12.5px;color:var(--dim);margin:14px 0 0">
+          Lines are <code>PLANNER|name|features|mean vertices|attribute fields</code>. Paste as many as
+          you measured; the script prints one per feature class. Rows land in the table above as Feature
+          type with growth and sync off, so set those yourself for anything being actively collected.
+        </p>
+        <p style="font-size:12.5px;color:var(--dim);margin:14px 0 0">
+          Measuring replaces the two inputs the presets are most often wrong about. It does not verify
+          the byte assumptions listed below, so after you publish one of these layers, compare its real
+          size on the organization status dashboard against the modeled size in the table. If they are
+          far apart, the assumptions need revisiting, not your measurements.
+        </p>
+    </div>
+  </div>
+</aside>
 
 <script>
 "use strict";
@@ -1276,6 +1308,42 @@ function renderAdvice(yearStd, yearNoFeat, months, price, avail, featMB1){
     + bullets.map(b=>'<li style="margin-bottom:6px">'+b+'</li>').join('') + '</ul>';
 }
 
+/* ---------- scope drawer ---------- */
+let scopeReturn = null;
+function scopeOpen(){ return document.getElementById("scopeDrawer").classList.contains("on"); }
+function openScope(){
+  const d = document.getElementById("scopeDrawer"), sc = document.getElementById("scopeScrim");
+  if(!d || scopeOpen()) return;
+  scopeReturn = document.activeElement;
+  d.classList.add("on"); sc.classList.add("on");
+  d.setAttribute("aria-hidden","false");
+  document.body.style.overflow = "hidden";
+  d.querySelector(".drawer-body").scrollTop = 0;
+  const t = document.getElementById("measIn");
+  // preventScroll keeps the drawer at the top instead of jumping to step 2 on narrow screens
+  if(t) setTimeout(()=>{ try{ t.focus({preventScroll:true}); }catch(e){ t.focus(); } }, 230);
+}
+function closeScope(){
+  const d = document.getElementById("scopeDrawer"), sc = document.getElementById("scopeScrim");
+  if(!d || !scopeOpen()) return;
+  d.classList.remove("on"); sc.classList.remove("on");
+  d.setAttribute("aria-hidden","true");
+  document.body.style.overflow = "";
+  if(scopeReturn && scopeReturn.focus) scopeReturn.focus();
+  scopeReturn = null;
+}
+document.addEventListener("keydown", e=>{
+  if(e.key === "Escape" && scopeOpen()){ e.preventDefault(); closeScope(); return; }
+  if(e.key !== "Tab" || !scopeOpen()) return;
+  // keep tabbing inside the drawer while it is open
+  const f = document.getElementById("scopeDrawer").querySelectorAll(
+    'button, textarea, input, a[href], [tabindex]:not([tabindex="-1"])');
+  if(!f.length) return;
+  const first = f[0], last = f[f.length-1];
+  if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
+  else if(!e.shiftKey && document.activeElement === last){ e.preventDefault(); first.focus(); }
+});
+
 function copyCode(btn){
   const pre = btn.closest(".codewrap").querySelector("pre");
   const txt = pre.textContent;
@@ -1317,7 +1385,9 @@ function importMeasured(){
   });
   if(added){
     drawRows(); calc(); save(); ta.value = "";
-    measFlash(added+" measured layer"+(added>1?"s":"")+" added to the table above"+(skipped?", "+skipped+" line"+(skipped>1?"s":"")+" ignored":"")+".");
+    const note = added+" measured layer"+(added>1?"s":"")+" added"+(skipped?", "+skipped+" line"+(skipped>1?"s":"")+" ignored":"")+".";
+    closeScope();
+    flash(note);
     document.querySelector("#layers tbody tr:last-child").scrollIntoView({behavior:"smooth", block:"center"});
   } else {
     measFlash("No PLANNER lines found. Copy the lines that start with PLANNER.");
