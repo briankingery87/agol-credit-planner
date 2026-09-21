@@ -1,0 +1,1440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ArcGIS Online Credit Planner</title>
+<meta name="description" content="Model ArcGIS Online credit consumption for hosted content and transactions. Published Esri rates, an open sizing model you can measure against your own data, and burn charts against your actual credit supply.">
+<meta name="author" content="Brian Kingery, GISP, PMP">
+<meta property="og:title" content="ArcGIS Online Credit Planner">
+<meta property="og:description" content="Model credit burn for hosted layers, imagery, files and transactions against your real credit supply.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='%231b6ec2'/><circle cx='16' cy='16' r='7' fill='none' stroke='%23ffffff' stroke-width='2.5'/><circle cx='16' cy='16' r='2.5' fill='%23ffffff'/></svg>">
+<style>
+:root{
+  --bg:#f7f8fa;
+  --panel:#ffffff;
+  --panel-2:#f2f4f7;
+  --panel-3:#eceff3;
+  --line:#dde2e8;
+  --line-2:#eaedf1;
+  --text:#15202b;
+  --dim:#54616e;
+  --dim-2:#6b7682;
+  --accent:#1b6ec2;
+  --accent-2:#14528f;
+  --warn:#c2700e;
+  --bad:#c23b2e;
+  --good:#1f7a4d;
+  --purple:#6b4fbb;
+  --on-accent:#ffffff;
+  --row-hover:#f4f8fd;
+  --code-bg:#f2f4f7;
+  --code-text:#23303d;
+  --tip-bg:#ffffff;
+  --tip-shadow:rgba(21,32,43,.16);
+  /* ArcGIS Online status dashboard series colors, sampled from the org dashboard */
+  --c-feature:#008a0b;
+  --c-file:#0022cc;
+  --c-imagery:#ca1c9e;
+  --c-tile:#aa00cc;
+  --c-trans:#de3712;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1280px;margin:0 auto;padding:0 22px 90px}
+a{color:var(--accent);text-decoration:none;border-bottom:1px solid rgba(27,110,194,.30)}
+a:hover{color:var(--accent-2);border-bottom-color:var(--accent-2)}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--accent)}
+
+/* header */
+header.top{padding:34px 0 24px;border-bottom:1px solid var(--line)}
+header.top h1{font-size:30px;font-weight:650;letter-spacing:-.02em;margin:8px 0 0}
+.hdr{display:flex;justify-content:space-between;align-items:flex-start;gap:30px;flex-wrap:wrap}
+.hdr>*{min-width:0}
+.byline{display:flex;align-items:center;gap:15px;flex-wrap:wrap;padding-top:4px}
+.byline img#authorPhoto,.byline .avatar{width:58px;height:58px;border-radius:50%;object-fit:cover;flex:none;
+  border:2px solid var(--accent);background:var(--panel-3)}
+.byline .avatar{display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:650;color:var(--accent)}
+.byline .nm{font-size:14.5px;font-weight:650;letter-spacing:-.01em}
+.byline .role{font-size:12.5px;color:var(--dim);margin-top:1px}
+.byline .lnk{font-size:12.5px;margin-top:5px}
+.byline img.tg{width:172px;height:auto;flex:none}
+.lede{display:grid;grid-template-columns:1.55fr 1fr;gap:34px;margin-top:14px;align-items:start}
+.lede p{margin:0 0 10px;color:var(--dim);font-size:14.5px}
+.lede p strong{color:var(--text);font-weight:600}
+.callout{
+  border:1px solid var(--line);background:var(--panel-2);border-radius:5px;padding:14px 16px;font-size:13px;color:var(--dim);
+}
+.callout h4{margin:0 0 7px;font-size:12.5px;color:var(--text);font-weight:650}
+.callout ul{margin:0;padding-left:16px}
+.callout li{margin-bottom:5px}
+
+/* kpi strip */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:5px;overflow:hidden;margin:0 0 16px}
+.kpi{background:var(--panel);padding:16px 17px 15px;min-width:0}
+.kpi .n{font-size:30px;font-weight:650;letter-spacing:-.025em;line-height:1.08;word-break:break-word}
+.kpi .l{font-size:12.5px;color:var(--dim);margin-top:6px}
+.kpi .s{font-size:12px;color:var(--dim-2);margin-top:3px}
+.kpi.good .n{color:var(--good)} .kpi.warn .n{color:var(--warn)} .kpi.bad .n{color:var(--bad)}
+
+/* sections */
+section{margin:0 0 38px;scroll-margin-top:16px}
+h2{font-size:17px;font-weight:650;letter-spacing:-.01em;margin:0 0 4px;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+h2 .num{font-size:11px;font-weight:700;color:var(--accent);letter-spacing:.1em}
+.h2rule{height:1px;background:var(--line);margin:10px 0 16px}
+.sub{display:grid;grid-template-columns:repeat(3,1fr);gap:26px;color:var(--dim);font-size:13.5px;margin-bottom:18px}
+.sub p{margin:0}
+.sub.two{grid-template-columns:1fr 1fr}
+.sub.one{grid-template-columns:1fr}
+
+/* panels */
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:5px;padding:18px}
+.panel h3{margin:0 0 3px;font-size:13.5px;font-weight:650}
+.panel .ph{font-size:12.5px;color:var(--dim-2);margin:0 0 14px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3>*,.grid2>*,.charts>*,.sub>*,.lede>*,footer .cols>*{min-width:0}
+pre{max-width:100%}
+
+/* field rows */
+.f{display:grid;grid-template-columns:1fr 112px;gap:7px 12px;align-items:center;font-size:13px}
+.f .k{color:var(--dim)}
+.f .head{grid-column:1/-1;font-size:11px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:var(--accent);
+  margin-top:13px;padding-bottom:5px;border-bottom:1px solid var(--line-2)}
+.f .head:first-child{margin-top:0}
+.f .span{grid-column:1/-1}
+input,select,button{font:inherit;font-variant-numeric:tabular-nums}
+input[type=text],input[type=number],select{
+  width:100%;font-size:13px;padding:6px 8px;border:1px solid var(--line);border-radius:3px;
+  background:var(--panel-2);color:var(--text);
+}
+input[type=number]{text-align:right}
+textarea{width:100%;font:12px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  padding:8px 9px;border:1px solid var(--line);border-radius:3px;background:var(--panel-2);
+  color:var(--text);resize:vertical;min-height:96px}
+.codewrap{min-width:0}
+.codebar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 7px}
+.codebar .lbl{font-size:11px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:var(--dim-2)}
+.codebar button{padding:4px 10px;font-size:12px}
+input:focus,select:focus,button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+input[readonly]{background:#eef1f5;color:var(--dim)}
+input[disabled],select[disabled]{opacity:.35}
+input[type=checkbox]{accent-color:var(--accent);width:15px;height:15px}
+.chk{display:flex;align-items:center;justify-content:center}
+.inline{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--dim)}
+
+button{
+  font-size:13px;padding:7px 13px;border:1px solid var(--line);border-radius:3px;
+  background:var(--panel-3);color:var(--text);cursor:pointer;
+}
+button:hover{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+button.ghost{background:transparent;color:var(--dim)}
+button.ghost:hover{background:var(--panel-3);color:var(--text);border-color:var(--line)}
+button.x{border:none;background:none;color:var(--dim-2);padding:2px 5px;font-size:17px;line-height:1}
+button.x:hover{background:none;color:var(--bad)}
+.btnrow{display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin-top:14px}
+.btnrow .sep{width:1px;height:20px;background:var(--line);margin:0 4px}
+.msg{font-size:12.5px;color:var(--good)}
+
+/* table */
+.scroller{overflow-x:auto;border:1px solid var(--line);border-radius:5px;background:var(--panel)}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:980px}
+thead th{
+  text-align:left;font-weight:600;font-size:11.5px;color:var(--dim);
+  padding:11px 9px;border-bottom:1px solid var(--line);vertical-align:bottom;background:var(--panel-2);
+  position:relative;white-space:nowrap;
+}
+th.num,td.num{text-align:right}
+tbody td{padding:5px 9px;border-bottom:1px solid var(--line-2)}
+tbody tr:hover{background:var(--row-hover)}
+tfoot td{padding:11px 9px;border-top:1px solid var(--accent);font-weight:650;background:var(--panel-2)}
+td.out{color:var(--accent-2);font-variant-numeric:tabular-nums}
+
+/* tooltips */
+.tip{cursor:help}
+.tip .q{
+  display:inline-block;width:13px;height:13px;line-height:13px;text-align:center;border-radius:50%;
+  border:1px solid var(--dim-2);color:var(--dim-2);font-size:9.5px;margin-left:5px;vertical-align:1px;font-weight:700;
+}
+.tip:hover .q,.tip:focus .q{border-color:var(--accent);color:var(--accent)}
+.tip::after{
+  content:attr(data-tip);position:absolute;z-index:40;left:9px;top:calc(100% - 2px);
+  width:250px;padding:9px 11px;background:var(--tip-bg);border:1px solid var(--accent);border-radius:4px;
+  color:var(--text);font-size:11.5px;font-weight:400;line-height:1.45;white-space:normal;text-align:left;
+  opacity:0;pointer-events:none;transform:translateY(-4px);transition:opacity .12s,transform .12s;
+  box-shadow:0 8px 24px var(--tip-shadow);
+}
+.tip:hover::after,.tip:focus::after{opacity:1;transform:translateY(0)}
+.tip.r::after{left:auto;right:9px}
+@media (prefers-reduced-motion:reduce){.tip::after{transition:none}}
+
+/* charts */
+.charts{display:grid;grid-template-columns:1.35fr 1fr;gap:16px}
+.chartcard{background:var(--panel);border:1px solid var(--line);border-radius:5px;padding:15px 16px 12px}
+.chartcard h3{margin:0 0 2px;font-size:13.5px;font-weight:650}
+.chartcard .ph{font-size:12px;color:var(--dim-2);margin:0 0 12px}
+svg{display:block;width:100%;height:auto;overflow:visible}
+.readout{
+  margin-top:10px;padding-top:10px;border-top:1px solid var(--line-2);
+  font-size:12.5px;color:var(--dim);min-height:20px;display:flex;flex-wrap:wrap;gap:14px;
+}
+.readout b{color:var(--text);font-weight:600}
+.legend{display:flex;flex-wrap:wrap;gap:13px;font-size:11.5px;color:var(--dim);margin-top:10px}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+
+/* reference */
+.ref{width:100%;border-collapse:collapse;font-size:13px;min-width:0}
+.ref th{text-align:left;font-size:11.5px;color:var(--dim);font-weight:600;padding:8px 9px;border-bottom:1px solid var(--line);background:none;white-space:normal}
+.ref td{padding:7px 9px;border-bottom:1px solid var(--line-2);vertical-align:top}
+.ref td:last-child,.ref th:last-child{text-align:right;white-space:nowrap}
+.ref.tiers td,.ref.tiers th{white-space:normal;vertical-align:middle}
+.ref.tiers th{font-size:11px}
+.ref.tiers td.num,.ref.tiers th.num{text-align:right}
+.ref.tiers input[type=number]{width:74px;display:inline-block;padding:4px 6px;font-size:12.5px}
+.ref.tiers td:first-child{width:34%}
+pre{
+  margin:0;background:var(--code-bg);border:1px solid var(--line);border-radius:4px;padding:13px 14px;
+  overflow-x:auto;font:12px/1.6 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--code-text);
+}
+pre .c{color:var(--dim-2)} pre .s{color:var(--good)} pre .k{color:var(--purple)}
+code{background:var(--code-bg);border:1px solid var(--line);border-radius:3px;padding:1px 5px;font-size:12px}
+
+.band{background:var(--panel-2);border:1px solid var(--line);border-left:3px solid var(--warn);border-radius:4px;padding:13px 16px;font-size:13px;color:var(--dim)}
+.band strong{color:var(--text)}
+
+
+footer{margin-top:28px;padding-top:18px;border-top:1px solid var(--line);font-size:12.5px;color:var(--dim-2)}
+footer .cols{display:grid;grid-template-columns:repeat(3,1fr);gap:26px}
+footer p{margin:0 0 9px}
+footer strong{color:var(--dim)}
+
+@media (max-width:1000px){
+  .lede,.sub,.sub.two,.grid3,.grid2,.charts,footer .cols{grid-template-columns:1fr}
+  .kpis{grid-template-columns:1fr 1fr}
+  .tip::after{width:210px}
+}
+@media print{
+  @page{size:letter portrait;margin:0.45in}
+  html,body{background:#fff;color:#111}
+  body{font-size:10px;line-height:1.4}
+  .wrap{max-width:none;width:auto;padding:0;margin:0}
+  .noprint{display:none!important}
+  a{color:#111;border-bottom:none}
+  .panel,.chartcard,.scroller,.kpi,.callout,.band{background:#fff;border-color:#bbb}
+
+  /* every multi-column grid collapses so nothing is squeezed off the sheet */
+  .hdr,.lede,.sub,.sub.two,.sub.one,.grid3,.grid2,footer .cols{
+    display:block!important
+  }
+  .lede>*+*,.sub>*+*,.grid3>*+*,.grid2>*+*,footer .cols>*+*{margin-top:9px!important}
+  /* the two burn charts stay side by side so both land on one sheet */
+  .charts{display:grid!important;grid-template-columns:1.3fr 1fr;gap:12px}
+  .chartcard{padding:11px 12px 9px}
+  .readout{display:none!important}
+  .legend{font-size:8.5px;gap:9px;margin-top:7px}
+  .kpis{display:grid!important;grid-template-columns:repeat(4,1fr);margin:0 0 12px}
+  .kpi .n{font-size:19px}
+  .kpi .l,.kpi .s{font-size:9px}
+
+  /* tables print as tables, not as a horizontally scrolled strip */
+  .scroller{overflow:visible!important}
+  table{min-width:0!important;width:100%!important;table-layout:fixed;font-size:8.5px}
+  th,td{padding:3px 4px!important;word-break:break-word;white-space:normal!important}
+  thead th{font-size:8px}
+  .tip .q{display:none!important}
+  /* fixed column shares so the hosted-content table never clips a layer name */
+  #layers{table-layout:fixed}
+  #layers th:nth-child(1),#layers td:nth-child(1){width:20%}
+  #layers th:nth-child(2),#layers td:nth-child(2){width:8%}
+  #layers th:nth-child(3),#layers td:nth-child(3){width:9%}
+  #layers th:nth-child(4),#layers td:nth-child(4){width:8%}
+  #layers th:nth-child(5),#layers td:nth-child(5){width:8%}
+  #layers th:nth-child(6),#layers td:nth-child(6){width:7%}
+  #layers th:nth-child(7),#layers td:nth-child(7){width:5%}
+  #layers th:nth-child(8),#layers td:nth-child(8){width:7%}
+  #layers th:nth-child(9),#layers td:nth-child(9){width:10%}
+  #layers th:nth-child(10),#layers td:nth-child(10){width:9%}
+  #layers th:nth-child(11),#layers td:nth-child(11){width:9%}
+  #layers th:nth-child(12),#layers td:nth-child(12){display:none}
+  .ref td,.ref th{font-size:9px}
+  tr,img,svg{break-inside:avoid;page-break-inside:avoid}
+
+  /* form controls read as plain values on paper */
+  input[type=text],input[type=number],select,textarea{
+    border:none!important;background:none!important;padding:0!important;
+    font-size:9px!important;color:#111!important;-webkit-appearance:none;appearance:none
+  }
+  input[type=checkbox]{width:10px;height:10px}
+  input[readonly]{background:none!important}
+
+  /* keep cards and headings whole */
+  .panel,.chartcard,.kpi,.callout,.band,.author{break-inside:avoid;page-break-inside:avoid}
+  h1,h2,h3{break-after:avoid;page-break-after:avoid}
+  section{margin:0 0 16px}
+  header.top{padding-top:0}
+  .byline{gap:10px}
+  .byline img.tg{width:140px}
+
+  pre{white-space:pre-wrap;word-break:break-word;font-size:8px;padding:8px 9px;
+      background:#f4f4f4;border-color:#ccc;color:#111}
+  pre .c,pre .s,pre .k{color:#111}
+  code{background:#f4f4f4;border-color:#ccc}
+  svg{max-width:100%;height:auto}
+  .tip::after{display:none!important}
+  .readout{font-size:9px}
+  footer{font-size:9px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="hdr">
+    <div>
+      <div class="eyebrow">ArcGIS Online planning tool</div>
+      <h1>Credit Planner</h1>
+    </div>
+    <div class="byline">
+      <img id="authorPhoto" src="assets/author.jpg" alt="Brian Kingery, GISP, PMP" width="58" height="58">
+      <div class="who">
+        <div class="nm">Brian Kingery, GISP, PMP</div>
+        <div class="role">GIS Solutions Architect</div>
+        <div class="lnk"><a id="liLink" href="https://www.linkedin.com/in/briankingery87/" target="_blank" rel="noopener">Connect on LinkedIn</a></div>
+      </div>
+      <img class="tg" src="assets/tg-geospatial-graylime.png" alt="Timmons Group Geospatial Solutions" width="172" height="68">
+    </div>
+  </div>
+  <div class="lede">
+    <div>
+      <p>Credits are the currency used across ArcGIS. They are spent on two different things, and
+         conflating them is where most credit anxiety comes from. <strong>Storage</strong> is a
+         recurring monthly rent on everything you host. <strong>Transactions</strong> are one-time
+         charges for geocoding, analysis, routing, printing and premium content. This tool models
+         both against the credits your organization actually has.</p>
+      <p>The published Esri rates are fixed and are used as-is. The part that needs judgment is how
+         large your hosted data will be once it lands in ArcGIS Online. That part is an engineering
+         estimate, not an Esri figure, so section 02 includes a script that measures your real
+         geometry in ArcGIS Pro and loads it straight into the table. Nothing is sent anywhere;
+         everything runs in your browser.</p>
+    </div>
+    <div class="callout">
+      <h4>Use it in three passes</h4>
+      <ul>
+        <li>Set your credit supply from your user type mix or your real balance.</li>
+        <li>List what you intend to host. Use the presets as starting points and correct them.</li>
+        <li>Measure your real geometry in ArcGIS Pro and load it in, then re-read the charts.</li>
+      </ul>
+    </div>
+  </div>
+</header>
+
+<!-- 1 -->
+<section id="sec-supply">
+  <h2><span class="num">01</span> Your credit supply</h2>
+  <div class="h2rule"></div>
+  <div class="sub">
+    <p>Every subscription includes a pool of credits shared by the organization, sized by the user
+       types you hold. Creator, Professional and Professional Plus include 500 each; Mobile Worker
+       and Contributor include 250. Viewer and Editor include none.</p>
+    <p>Unused subscription credits expire at the end of the subscription term, so the planning unit
+       is the subscription year, not the life of the project. Credits you purchase separately expire
+       after two years.</p>
+    <p>If you already know your balance, skip the user type math and enter it directly. An
+       organization that spends its entire balance enters a restricted state: existing content keeps
+       working, but no one can publish anything new.</p>
+  </div>
+  <div class="grid3">
+    <div class="panel">
+      <h3>User types</h3>
+      <p class="ph">Counts of assigned licenses in the org.</p>
+      <div class="f" id="users"></div>
+    </div>
+    <div class="panel">
+      <h3>Balance and term</h3>
+      <p class="ph">Override the calculation if you have a real number.</p>
+      <div class="f" id="supply"></div>
+    </div>
+    <div class="panel">
+      <h3>Feature data store</h3>
+      <p class="ph">Which storage model your subscription is on.</p>
+      <div class="f" id="fds"></div>
+      <p style="font-size:12.5px;color:var(--dim);margin:14px 0 0">
+        Standard is the default and includes up to 500 GB of feature data storage charged with
+        credits, pay as you go. Premium replaces that with a fixed subscription price and dedicated
+        database resources. Premium covers <em>feature</em> storage only. File storage, imagery
+        storage and every transaction still bill the same way in both.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- 2 -->
+<section id="sec-content">
+  <h2><span class="num">02</span> What you are hosting</h2>
+  <div class="h2rule"></div>
+  <div class="sub two">
+    <p>One row per hosted item. Feature layers are sized from geometry and attributes, because vertex
+       count is the dominant term in a hosted feature layer and attribute width is second. Imagery,
+       tile caches, packages, documents and attachments are billed on their file size instead, so
+       enter those directly in GB.</p>
+    <p>Hover any column heading for what it means and where the number comes from. The presets are
+       starting points drawn from typical production data, not measurements of yours. The panel
+       below the table replaces them with your own measured values in about two minutes.</p>
+  </div>
+  <div class="scroller">
+  <table id="layers">
+    <thead><tr>
+      <th style="min-width:180px" class="tip" tabindex="0" data-tip="Whatever you will recognize it by. This label only appears in this tool and in the copied summary.">Item<span class="q">?</span></th>
+      <th style="width:105px" class="tip" tabindex="0" data-tip="Feature bills at 2.4 credits per 10 MB per month. Imagery and File both bill at 1.2 credits per 1 GB per month. Attachments, PDFs, packages, vector tile layers and offline map areas are all File.">Type<span class="q">?</span></th>
+      <th class="num tip" tabindex="0" data-tip="Row count in the layer. For a layer you already have, this is the record count in ArcGIS Pro or on the item page.">Features<span class="q">?</span></th>
+      <th class="num tip" tabindex="0" data-tip="Average points making up each shape. Points are 1. Simple rectangular parcels run 5 to 15, typical assessor parcels 15 to 40, generalized county boundaries in the hundreds, detailed hydrography or soils in the thousands. Measure yours with the script below the table.">Vertices<br>per feature<span class="q">?</span></th>
+      <th class="num tip" tabindex="0" data-tip="Number of attribute fields, excluding the ObjectID and the shape fields. Counts the fields you actually publish, so a layer trimmed before publishing is smaller here.">Attribute<br>fields<span class="q">?</span></th>
+      <th class="num tip" tabindex="0" data-tip="For Imagery and File rows only. The size on disk of the imagery, cache, documents or attachments you will store. Ignored for Feature rows.">Size GB<span class="q">?</span></th>
+      <th class="tip" tabindex="0" data-tip="Enable Sync, offline use, and change tracking all retain extra rows and indexes, so the stored size grows beyond the source data. Applies a 1.70x multiplier to the modeled size.">Sync<span class="q">?</span></th>
+      <th class="num tip r" tabindex="0" data-tip="Compounding monthly growth in this layer. Use it for anything being actively collected or appended. Leave at 0 for a static reference layer.">Growth<br>%/mo<span class="q">?</span></th>
+      <th class="num tip r" tabindex="0" data-tip="Modeled size in ArcGIS Online at month 1, after index and storage overhead. This is an engineering estimate, not an Esri figure. Measure your real geometry with the script below the table to firm it up.">Modeled<br>size<span class="q">?</span></th>
+      <th class="num tip r" tabindex="0" data-tip="Recurring credits per month to keep this item hosted, at month 1. Storage is charged hourly, so deleting content mid-month stops the charge immediately.">Credits<br>/mo<span class="q">?</span></th>
+      <th class="num tip r" tabindex="0" data-tip="Monthly credits converted at the credit price you set in section 01. Credit pricing varies by agreement, so treat this as indicative until your Esri quote confirms it.">$/mo<span class="q">?</span></th>
+      <th style="width:26px"></th>
+    </tr></thead>
+    <tbody></tbody>
+    <tfoot><tr>
+      <td colspan="8">Total at month 1</td>
+      <td class="num" id="tSize">-</td><td class="num" id="tCred">-</td><td class="num" id="tCost">-</td><td></td>
+    </tr></tfoot>
+  </table>
+  </div>
+  <div class="btnrow noprint">
+    <button onclick="addRow()">Add item</button>
+    <span class="sep"></span>
+    <span style="font-size:12px;color:var(--dim-2);margin-right:2px">Presets</span>
+    <span id="presetBtns"></span>
+    <span class="sep"></span>
+    <button class="ghost" onclick="clearRows()">Clear all</button>
+  </div>
+
+  <div class="panel" style="margin-top:16px">
+    <h3>Measure your own geometry, then load it straight in</h3>
+    <p class="ph">Two steps. Run the script in the ArcGIS Pro Python window, then paste the PLANNER lines it prints into the box on the right. Each line becomes a row in the table above with your real feature count, mean vertex count and field count already filled in.</p>
+    <div class="grid2">
+      <div class="codewrap">
+        <div class="codebar">
+          <span class="lbl">Step 1 &middot; ArcGIS Pro Python window</span>
+          <button class="ghost noprint" onclick="copyCode(this)">Copy script</button>
+        </div>
+<pre><span class="c"># Measure feature classes for the AGOL Credit Planner.</span>
+<span class="c"># Copy the PLANNER lines from the output and paste them</span>
+<span class="c"># into the planner, section 02.</span>
+<span class="k">import</span> arcpy, statistics
+
+FCS = [
+    r<span class="s">"C:\data\Base.gdb\Parcels"</span>,
+    <span class="c"># add more feature classes here</span>
+]
+
+<span class="k">for</span> fc <span class="k">in</span> FCS:
+    name = arcpy.Describe(fc).baseName
+    v = [r[0].pointCount <span class="k">for</span> r
+         <span class="k">in</span> arcpy.da.SearchCursor(fc, [<span class="s">"SHAPE@"</span>])
+         <span class="k">if</span> r[0]]
+    f = [x <span class="k">for</span> x <span class="k">in</span> arcpy.ListFields(fc)
+         <span class="k">if</span> x.type <span class="k">not in</span> (<span class="s">"OID"</span>, <span class="s">"Geometry"</span>)
+         <span class="k">and</span> x.name.lower() <span class="k">not in</span>
+         (<span class="s">"shape_length"</span>, <span class="s">"shape_area"</span>)]
+    <span class="k">if not</span> v:
+        <span class="k">print</span>(name, <span class="s">"has no geometry, skipped"</span>)
+        <span class="k">continue</span>
+    <span class="k">print</span>(<span class="s">"{}  features {:,}  mean {:.1f}  "</span>
+          <span class="s">"median {:.0f}  max {:,}  fields {}"</span>.format(
+          name, <span class="k">len</span>(v), statistics.mean(v),
+          statistics.median(v), <span class="k">max</span>(v), <span class="k">len</span>(f)))
+    <span class="k">print</span>(<span class="s">"PLANNER|{}|{}|{:.1f}|{}"</span>.format(
+          name, <span class="k">len</span>(v), statistics.mean(v), <span class="k">len</span>(f)))</pre>
+        <p style="font-size:12px;color:var(--dim-2);margin:11px 0 0">
+          The readable line is for you: a layer whose mean sits far above its median has a handful of
+          very dense shapes carrying the storage, and generalizing just those is usually the cheapest
+          optimization available. The PLANNER line is for the box on the right.
+        </p>
+      </div>
+      <div class="codewrap noprint">
+        <div class="codebar">
+          <span class="lbl">Step 2 &middot; paste the output back</span>
+          <button class="ghost" onclick="pasteMeasured()">Clear</button>
+        </div>
+        <textarea id="measIn" rows="9" spellcheck="false" aria-label="Paste PLANNER lines from the ArcGIS Pro script"
+          placeholder="PLANNER|Parcels|45000|24.3|28&#10;PLANNER|Roads|30000|41.7|20"></textarea>
+        <div class="btnrow" style="margin-top:9px">
+          <button onclick="importMeasured()">Add as layer rows</button>
+          <span class="msg" id="measMsg"></span>
+        </div>
+        <p style="font-size:12.5px;color:var(--dim);margin:14px 0 0">
+          Lines are <code>PLANNER|name|features|mean vertices|attribute fields</code>. Paste as many as
+          you measured; the script prints one per feature class. Rows land in the table above as Feature
+          type with growth and sync off, so set those yourself for anything being actively collected.
+        </p>
+        <p style="font-size:12.5px;color:var(--dim);margin:14px 0 0">
+          Measuring replaces the two inputs the presets are most often wrong about. It does not verify
+          the byte assumptions listed below, so after you publish one of these layers, compare its real
+          size on the organization status dashboard against the modeled size in the table. If they are
+          far apart, the assumptions need revisiting, not your measurements.
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="band" style="margin-top:16px">
+    <strong>What the modeled size is built from.</strong>
+    Esri publishes credits per megabyte, not megabytes per feature, so the size column is an
+    engineering estimate rather than a published figure: 16 bytes per vertex (two 8-byte doubles),
+    24 bytes per attribute value, 48 bytes of row overhead, then 1.60x for indexes and storage
+    structures and a further 1.70x where sync is on. Those are reasonable working numbers, not an
+    authority. Measure your geometry above to fix the vertex and field counts, and check one
+    published layer against your organization status dashboard before a number here goes into a
+    budget, a proposal or a client conversation.
+  </div>
+</section>
+
+<!-- 3 -->
+<section id="sec-transactions">
+  <h2><span class="num">03</span> Transactions and analysis</h2>
+  <div class="h2rule"></div>
+  <div class="sub two">
+    <p>These are the line items that surprise people. Storing a few million polygons is cheap and
+       predictable. Geocoding a large address table, generating a tile cache, or leaving an advanced
+       notebook running is neither. Everything in this section bills identically whether you are on a
+       Standard or a Premium feature data store.</p>
+    <p>Enter what you expect in a typical month. Note that searching for addresses is free; credits
+       are only consumed when geocoded points are saved. Most day-to-day work, including viewing
+       maps, editing existing layers, using Living Atlas basemaps and exporting data, costs nothing.</p>
+  </div>
+  <div class="grid2">
+    <div class="panel"><h3>Recurring monthly</h3><p class="ph">Charged every month of the horizon.</p><div class="f" id="txm"></div></div>
+    <div class="panel"><h3>One-time, first month</h3><p class="ph">Setup and migration work that happens once.</p><div class="f" id="txo"></div></div>
+  </div>
+</section>
+
+
+<!-- 4 -->
+<section id="sec-burn">
+  <h2><span class="num">04</span> Burn</h2>
+  <div class="h2rule"></div>
+  <div class="sub two">
+    <p>The left chart runs cumulative spend inside each subscription year against your available
+       credits, and resets at each anniversary because unused subscription credits do not carry over.
+       The crossing point is the month you would need to buy more. Hover for the numbers at any month.</p>
+    <p>The right chart separates the monthly spend into storage that compounds and transactions that
+       do not, which is the distinction that matters when you are deciding what to optimize. If the
+       bars are mostly storage, look at geometry and retention. If they are mostly transactions, look
+       at workflow.</p>
+  </div>
+  <div class="kpis">
+    <div class="kpi" id="k1"><div class="n">-</div><div class="l">Modeled storage</div><div class="s"></div></div>
+    <div class="kpi" id="k2"><div class="n">-</div><div class="l">Credits per month</div><div class="s"></div></div>
+    <div class="kpi" id="k3"><div class="n">-</div><div class="l">Credits per subscription year</div><div class="s"></div></div>
+    <div class="kpi" id="k4"><div class="n">-</div><div class="l">Annual credit supply</div><div class="s"></div></div>
+  </div>
+  <div class="charts">
+    <div class="chartcard">
+      <h3>Cumulative spend against available credits</h3>
+      <p class="ph">Resets each subscription year. Dashed line is your available pool.</p>
+      <div id="chart1"></div>
+      <div class="readout" id="ro1">Hover the chart for month detail.</div>
+    </div>
+    <div class="chartcard">
+      <h3>Monthly spend by category</h3>
+      <p class="ph">Storage compounds with growth. Transactions stay flat.</p>
+      <div id="chart2"></div>
+      <div class="legend">
+        <span><i style="background:var(--c-feature)"></i>Feature storage</span>
+        <span><i style="background:var(--c-file)"></i>File storage</span>
+        <span><i style="background:var(--c-imagery)"></i>Imagery storage</span>
+        <span><i style="background:var(--c-trans)"></i>Transactions</span>
+      </div>
+      <div class="readout" id="ro2">Hover a bar for the split.</div>
+    </div>
+  </div>
+  <div class="grid2" style="margin-top:16px">
+    <div class="panel">
+      <h3>Where the credits go over the horizon</h3>
+      <p class="ph">Totals across the full planning horizon.</p>
+      <table class="ref"><tbody id="breakdown"></tbody></table>
+    </div>
+    <div class="panel">
+      <h3>If you moved to a Premium feature data store</h3>
+      <p class="ph">Feature storage leaves the credit model and becomes a fixed subscription line item. Everything else is unchanged.</p>
+      <table class="ref"><tbody id="pfds"></tbody></table>
+      <table class="ref tiers" id="pfdsTiers" style="margin-top:16px"><tbody></tbody></table>
+      <p id="pfdsVerdict" style="font-size:12.5px;color:var(--dim);margin:14px 0 0"></p>
+    </div>
+  </div>
+  <div class="band" style="margin-top:16px;border-left-color:var(--accent)">
+    <strong>Reading the Premium comparison.</strong>
+    The prices above are Esri
+    <a href="https://www.esri.com/en-us/arcgis/products/premium-feature-data-store/buy" target="_blank" rel="noopener">list prices</a>
+    as of September 2026: M2 $2,800 per month with 2 TB of feature data storage, M3 $4,950 with 3 TB,
+    M4 $9,500 with 4 TB. They are list, not your price, so overwrite them with what your agreement or
+    quote actually says before the numbers leave this page. Every field recalculates as you type.
+    <a href="https://doc.arcgis.com/en/arcgis-online/reference/faq.htm" target="_blank" rel="noopener">M2 is the entry level</a>,
+    each level doubles the database processing power of the one below it, and M4 is sixteen times the
+    compute of a Standard feature data store. There are two separate decisions here. Capacity and
+    performance pick the level; the break-even decides whether Premium beats credits at all. A
+    Standard feature data store tops out at 500 GB of feature data, so past that Premium is required
+    rather than optional. Below it, Premium removes feature storage from the credit model without
+    removing the cost, and is worth it when feature storage dominates your burn, when heavy query,
+    edit or ETL loads need dedicated database resources, or when predictable billing matters more
+    than a lower absolute number.
+  </div>
+</section>
+
+<!-- 5 -->
+<section id="sec-reference">
+  <h2><span class="num">05</span> Published rates and reference values</h2>
+  <div class="h2rule"></div>
+  <div class="sub two">
+    <p>The left table is Esri's published credit consumption, used unchanged by this tool. It comes
+       from Understand credits unless a row links somewhere else, so any number here can be checked
+       at the source before it goes into a proposal.</p>
+    <p>The right table is a starting band for vertex counts by data type, assembled from typical
+       production datasets. Treat it as a way to sanity-check a number you entered, not as a source
+       to cite. Measure your own where the answer matters.</p>
+  </div>
+  <div class="grid2">
+    <div class="panel">
+      <h3>Esri credit rates</h3>
+      <p class="ph">All from <a href="https://doc.arcgis.com/en/arcgis-online/administer/credits.htm" target="_blank" rel="noopener">Understand credits</a> and used unchanged, except the four rows that link to a different page. Rates change; check the source before a number goes into a budget.</p>
+      <table class="ref"><tbody>
+        <tr><td>Feature storage, hosted feature layers</td><td>2.4 credits / 10 MB / month</td></tr>
+        <tr><td>File storage: attachments, documents, packages, vector tile layers, offline areas</td><td>1.2 credits / 1 GB / month</td></tr>
+        <tr><td>Tiled imagery storage</td><td>1.2 credits / 1 GB / month</td></tr>
+        <tr><td><a href="https://doc.arcgis.com/en/arcgis-online/create-maps/specify-the-runtime-of-a-notebook.htm" target="_blank" rel="noopener">Notebook workspace storage</a></td><td>12 credits / 1 GB / month / user</td></tr>
+        <tr><td>Geocoding, stored results</td><td>40 credits / 1,000</td></tr>
+        <tr><td>Printing from a custom layout template</td><td>5 credits / job</td></tr>
+        <tr><td>Simple routes</td><td>0.005 credits each</td></tr>
+        <tr><td>Optimized routes</td><td>0.5 credits each</td></tr>
+        <tr><td>Tile generation</td><td>1 credit / 10,000 tiles</td></tr>
+        <tr><td>Demographic maps and layers</td><td>10 credits / 1,000 map requests</td></tr>
+        <tr><td><a href="https://doc.arcgis.com/en/arcgis-online/create-maps/specify-the-runtime-of-a-notebook.htm" target="_blank" rel="noopener">Notebooks, Advanced runtime</a></td><td>3 credits / hour</td></tr>
+        <tr><td><a href="https://doc.arcgis.com/en/arcgis-online/create-maps/specify-the-runtime-of-a-notebook.htm" target="_blank" rel="noopener">Notebooks, Advanced with GPU</a></td><td>30 credits / hour</td></tr>
+        <tr><td><a href="https://doc.arcgis.com/en/arcgis-online/analyze/credits-analysis-mv.htm" target="_blank" rel="noopener">ModelBuilder analysis session</a></td><td>50 credits / hour</td></tr>
+        <tr><td>3D object layer from textured multipatch</td><td>1 credit / 1,000 features</td></tr>
+      </tbody></table>
+    </div>
+    <div class="panel">
+      <h3>Typical vertex counts</h3>
+      <p class="ph">Indicative ranges for sanity-checking, not published figures.</p>
+      <table class="ref"><tbody>
+        <tr><td>Any point layer: addresses, assets, field collection</td><td>1</td></tr>
+        <tr><td>Building footprints, simple</td><td>5 to 15</td></tr>
+        <tr><td>Parcels, platted subdivision</td><td>5 to 15</td></tr>
+        <tr><td>Parcels, typical county assessor mix</td><td>15 to 40</td></tr>
+        <tr><td>Parcels, rural and metes-and-bounds heavy</td><td>30 to 80</td></tr>
+        <tr><td>Road centerline segments</td><td>10 to 60</td></tr>
+        <tr><td>Utility mains and service lines</td><td>4 to 30</td></tr>
+        <tr><td>Zoning and land use polygons</td><td>20 to 120</td></tr>
+        <tr><td>Grid or fishnet index cells</td><td>5</td></tr>
+        <tr><td>Wetlands, soils, detailed hydrography</td><td>100 to 2,000</td></tr>
+        <tr><td>Generalized county or municipal boundaries</td><td>500 to 5,000</td></tr>
+        <tr><td>Watersheds, coastline, raw digitized boundaries</td><td>2,000 to 50,000</td></tr>
+      </tbody></table>
+    </div>
+  </div>
+  <div class="band" style="margin-top:16px">
+    <strong>Four practical levers, in the order they usually pay off.</strong>
+    Generalize the handful of dense shapes carrying your storage before you touch anything else.
+    Trim fields you do not publish, since every field is paid for in every row, every month.
+    Turn on Enable Sync and change tracking only where offline or editing is a real requirement,
+    because both grow the stored size over time. And delete or archive superseded content, since
+    storage is charged hourly and stops the moment the item is gone.
+  </div>
+</section>
+
+<!-- 6 -->
+<section id="sec-scenario" class="noprint">
+  <h2><span class="num">06</span> Save, share, reuse</h2>
+  <div class="h2rule"></div>
+  <div class="sub two">
+    <p>Your scenario is kept in this browser automatically. Export it to a JSON file to version it
+       with a project, send it to someone else, or come back to a comparison you ran months ago.
+       Importing replaces everything currently on the page.</p>
+    <p>The text summary is plain text with the rates and assumptions attached, sized to drop straight
+       into an email or a proposal appendix without reformatting. Print produces a clean page with
+       the charts and tables and the controls stripped out.</p>
+  </div>
+  <div class="btnrow" style="margin-top:0">
+    <button onclick="copySummary()">Copy text summary</button>
+    <button onclick="exportJSON()">Export scenario</button>
+    <button class="ghost" onclick="document.getElementById('imp').click()">Import scenario</button>
+    <input type="file" id="imp" accept=".json,application/json" style="display:none" onchange="importJSON(this)">
+    <button class="ghost" onclick="window.print()">Print or save as PDF</button>
+    <span class="sep"></span>
+    <button class="ghost" onclick="resetAll()">Reset to defaults</button>
+    <span class="msg" id="msg"></span>
+  </div>
+</section>
+
+<footer>
+  <div class="cols">
+    <div>
+      <p><strong>Source documentation.</strong>
+        <a href="https://doc.arcgis.com/en/arcgis-online/administer/credits.htm" target="_blank" rel="noopener">Understand credits</a>,
+        which carries the full credits-by-capability table.
+        <a href="https://doc.arcgis.com/en/arcgis-online/analyze/credits-analysis-mv.htm" target="_blank" rel="noopener">Credits for spatial analysis</a>.
+        <a href="https://doc.arcgis.com/en/arcgis-online/administer/dashboard.htm" target="_blank" rel="noopener">Organization status dashboard</a>,
+        where you read your real storage and usage.
+        <a href="https://doc.arcgis.com/en/arcgis-online/administer/configure-credits.htm" target="_blank" rel="noopener">Configure credit budgeting</a>.
+        <a href="https://doc.arcgis.com/en/arcgis-online/administer/user-types-orgs.htm" target="_blank" rel="noopener">User types</a>.
+        <a href="https://www.esri.com/en-us/arcgis/products/credits/overview" target="_blank" rel="noopener">Credits overview</a>.</p>
+    </div>
+    <div>
+      <p><strong>What this does not model.</strong> Sync and change-tracking growth beyond the flat
+         multiplier applied here, optimized-layer drawing indexes, storage held by deleted content
+         that has not been purged, GeoEnrichment variable counts, Business Analyst, Data Pipelines
+         compute, and anything your organization has negotiated outside standard terms.</p>
+    </div>
+    <div>
+      <p><strong>Estimate only.</strong> Credit rates and pricing change, and the sizing model is an
+         engineering approximation rather than an Esri figure. Verify against the Esri documentation
+         and your own organization status dashboard before committing a number to a budget, a
+         proposal or a client conversation.</p>
+      <p style="margin-top:14px">Runs entirely in your browser. No data leaves this page.</p>
+    </div>
+  </div>
+</footer>
+
+</div>
+
+<script>
+"use strict";
+
+/* ============ EDIT ME ============ */
+const AUTHOR = {
+  linkedin: "https://www.linkedin.com/in/briankingery87/",
+  photo:    "assets/author.jpg"   // square, 300x300 or larger
+};
+/* ================================= */
+
+/* ---- published Esri rates ---- */
+const RATE = {
+  featurePer10MB:2.4, filePerGB:1.2, imageryPerGB:1.2,
+  geocodePer1k:40, printJob:5, simpleRoute:0.005, optRoute:0.5,
+  tilePer10k:1, notebookHr:3, notebookGpuHr:30, modelBuilderHr:50, demoPer1k:10
+};
+const USER_TYPES = [
+  ["creator","Creator",500],["professional","Professional",500],["proplus","Professional Plus",500],
+  ["mobile","Mobile Worker",250],["contributor","Contributor",250],["editor","Editor / Viewer",0]
+];
+
+/* ---- sizing model constants ----
+   Not published by Esri. These are engineering estimates and they are the numbers
+   the modeled size column is built from. Edit them here if your data behaves
+   differently; section 02 discloses them on the page. */
+const DEFAULTS = {
+  users:{creator:3,professional:1,proplus:0,mobile:0,contributor:0,editor:5},
+  supply:{purchased:0, useBalance:false, balance:0, months:24, price:0.12},
+  fds:{premium:false, tier:"m2", m2:2800, m3:4950, m4:9500},
+  model:{bytesPerVertex:16,bytesPerAttr:24,rowOverhead:48,indexFactor:1.60,syncFactor:1.70,calibration:1.00},
+  txm:{geocodes:0,prints:0,optRoutes:0,simpleRoutes:0,tiles:0,notebookHrs:0,demoReq:0},
+  txo:{geocodes:0,tiles:0,notebookHrs:0},
+  rows:["parcels","roads","addresses","fieldpts","docs","imagery"]
+};
+
+const PRESETS = {
+  parcels:  {name:"Parcels, one county",        type:"feature", feat:45000,  vert:24,  attr:28, gb:0, sync:false, growth:0},
+  parcelsML:{name:"Parcels, multi-county",      type:"feature", feat:900000, vert:24,  attr:28, gb:0, sync:false, growth:0},
+  roads:    {name:"Road centerlines",           type:"feature", feat:30000,  vert:40,  attr:20, gb:0, sync:false, growth:0},
+  addresses:{name:"Address points",             type:"feature", feat:150000, vert:1,   attr:18, gb:0, sync:false, growth:0.2},
+  bldg:     {name:"Building footprints",        type:"feature", feat:120000, vert:12,  attr:10, gb:0, sync:false, growth:0},
+  util:     {name:"Utility network lines",      type:"feature", feat:80000,  vert:14,  attr:32, gb:0, sync:true,  growth:0.5},
+  fieldpts: {name:"Field collection points",    type:"feature", feat:5000,   vert:1,   attr:25, gb:0, sync:true,  growth:6},
+  env:      {name:"Environmental constraints",  type:"feature", feat:20000,  vert:90,  attr:18, gb:0, sync:false, growth:0},
+  bndy:     {name:"Administrative boundaries",  type:"feature", feat:3200,   vert:1800,attr:22, gb:0, sync:false, growth:0},
+  grid:     {name:"Grid or index cells",        type:"feature", feat:2000,   vert:5,   attr:20, gb:0, sync:false, growth:0},
+  imagery:  {name:"Imagery or tile cache",      type:"imagery", feat:0, vert:0, attr:0, gb:5,   sync:false, growth:0},
+  docs:     {name:"Documents, PDFs, KMZ",       type:"file",    feat:0, vert:0, attr:0, gb:2,   sync:false, growth:3},
+  photos:   {name:"Survey photos as attachments",type:"file",   feat:0, vert:0, attr:0, gb:4,   sync:false, growth:8}
+};
+
+let S, rows = [], uid = 0, chartData = null;
+
+/* ---------- state ---------- */
+function freshState(){
+  const s = JSON.parse(JSON.stringify(DEFAULTS));
+  delete s.rows;
+  return s;
+}
+function seedRows(){
+  rows = []; uid = 0;
+  DEFAULTS.rows.forEach(k=>{ const d = Object.assign({},PRESETS[k]); d.id = ++uid; rows.push(d); });
+}
+function save(){
+  try{ localStorage.setItem("agol-credit-planner", JSON.stringify({s:S,rows:rows})); }catch(e){}
+}
+function load(){
+  try{
+    const raw = localStorage.getItem("agol-credit-planner");
+    if(!raw) return false;
+    const d = JSON.parse(raw);
+    if(!d || !d.s || !Array.isArray(d.rows)) return false;
+    S = Object.assign(freshState(), d.s);
+    ["users","supply","fds","model","txm","txo"].forEach(g=>{
+      S[g] = Object.assign(JSON.parse(JSON.stringify(DEFAULTS[g])), d.s[g]||{});
+    });
+    rows = d.rows; uid = rows.reduce((m,r)=>Math.max(m,r.id||0),0);
+    return true;
+  }catch(e){ return false; }
+}
+
+/* ---------- control builders ---------- */
+function field(group,key,label,opts){
+  opts = opts||{};
+  const k = document.createElement("span"); k.className = "k"; k.textContent = label;
+  let i;
+  if(opts.type === "check"){
+    i = document.createElement("input"); i.type = "checkbox"; i.checked = !!S[group][key];
+    i.style.justifySelf = "end";
+  } else if(opts.type === "ro"){
+    i = document.createElement("input"); i.type = "text"; i.readOnly = true; i.id = opts.id || "";
+  } else {
+    i = document.createElement("input"); i.type = "number"; i.min = opts.min!==undefined?opts.min:0;
+    i.step = opts.step||"any"; i.value = S[group][key];
+  }
+  i.dataset.g = group; i.dataset.k = key;
+  if(opts.title){ k.title = opts.title; k.style.cursor = "help"; k.style.borderBottom = "1px dotted var(--dim-2)"; k.style.justifySelf = "start"; }
+  return [k,i];
+}
+function head(t){ const h = document.createElement("div"); h.className = "head"; h.textContent = t; return h; }
+
+function buildControls(){
+  const tb0 = document.querySelector("#pfdsTiers tbody");
+  if(tb0){ tb0.dataset.built = ""; tb0.innerHTML = ""; }
+  // user types
+  const u = document.getElementById("users"); u.innerHTML = "";
+  USER_TYPES.forEach(([k,l,c])=>{
+    const [a,b] = field("users",k,l + (c?"  ("+c+")":"  (0)"),{min:0,step:1});
+    u.append(a,b);
+  });
+  const tot = document.createElement("span"); tot.className = "k"; tot.style.fontWeight = "600"; tot.textContent = "Included per year";
+  const totv = document.createElement("input"); totv.type = "text"; totv.readOnly = true; totv.id = "incOut";
+  u.append(document.createElement("div"), document.createElement("div"), tot, totv);
+
+  // supply
+  const s = document.getElementById("supply"); s.innerHTML = "";
+  let f;
+  f = field("supply","purchased","Additional purchased credits",{min:0,step:1}); s.append(f[0],f[1]);
+  f = field("supply","useBalance","Use a known balance instead",{type:"check"}); s.append(f[0],f[1]);
+  f = field("supply","balance","Current credit balance",{min:0,step:1}); f[1].id = "balInput"; s.append(f[0],f[1]);
+  s.append(head("Planning"));
+  f = field("supply","months","Planning horizon, months",{min:1,step:1}); s.append(f[0],f[1]);
+  f = field("supply","price","Price per credit, USD",{min:0,step:0.01}); s.append(f[0],f[1]);
+
+  // fds
+  const d = document.getElementById("fds"); d.innerHTML = "";
+  f = field("fds","premium","Premium feature data store",{type:"check"}); d.append(f[0],f[1]);
+  const note = document.createElement("div"); note.className = "span";
+  note.style.cssText = "font-size:12px;color:var(--dim-2);padding-top:4px";
+  note.id = "fdsNote";
+  d.append(note);
+
+  // transactions
+  const m = document.getElementById("txm"); m.innerHTML = "";
+  [["geocodes","Stored geocodes per month"],["prints","Custom-template print jobs"],
+   ["optRoutes","Optimized routes"],["simpleRoutes","Simple routes"],
+   ["tiles","Tiles generated"],["notebookHrs","Notebook hours, Advanced"],
+   ["demoReq","Demographic map requests"]].forEach(([k,l])=>{
+    const f2 = field("txm",k,l,{min:0,step:1}); m.append(f2[0],f2[1]);
+  });
+  const o = document.getElementById("txo"); o.innerHTML = "";
+  [["geocodes","One-time geocodes"],["tiles","One-time tiles generated"],
+   ["notebookHrs","One-time notebook hours"]].forEach(([k,l])=>{
+    const f2 = field("txo",k,l,{min:0,step:1}); o.append(f2[0],f2[1]);
+  });
+  const on = document.createElement("div"); on.className = "span";
+  on.style.cssText = "font-size:12px;color:var(--dim-2);padding-top:10px";
+  on.textContent = "Bulk geocoding a large address table, or building a full tile cache, is usually a one-time charge at project setup. Put it here so it does not inflate the recurring monthly figure.";
+  o.append(on);
+
+  // preset buttons
+  const pb = document.getElementById("presetBtns"); pb.innerHTML = "";
+  pb.style.cssText = "display:inline-flex;flex-wrap:wrap;gap:7px";
+  Object.keys(PRESETS).forEach(k=>{
+    const b = document.createElement("button"); b.className = "ghost"; b.textContent = PRESETS[k].name;
+    b.onclick = ()=>{ const d2 = Object.assign({},PRESETS[k]); d2.id = ++uid; rows.push(d2); drawRows(); calc(); };
+    pb.appendChild(b);
+  });
+}
+
+/* ---------- rows ---------- */
+function addRow(){
+  rows.push({id:++uid,name:"New layer",type:"feature",feat:10000,vert:20,attr:15,gb:0,sync:false,growth:0});
+  drawRows(); calc();
+}
+function clearRows(){ rows = []; drawRows(); calc(); }
+function delRow(id){ rows = rows.filter(r=>r.id!==id); drawRows(); calc(); }
+
+function drawRows(){
+  const tb = document.querySelector("#layers tbody"); tb.innerHTML = "";
+  rows.forEach(r=>{
+    const isF = r.type === "feature";
+    const tr = document.createElement("tr");
+    tr.innerHTML =
+      '<td><input type="text" value="'+esc(r.name)+'" data-r="'+r.id+'" data-f="name"></td>'+
+      '<td><select data-r="'+r.id+'" data-f="type">'+
+        opt("feature","Feature",r.type)+opt("imagery","Imagery",r.type)+opt("file","File",r.type)+'</select></td>'+
+      '<td class="num"><input type="number" min="0" step="1" value="'+r.feat+'" data-r="'+r.id+'" data-f="feat"'+(isF?"":" disabled")+'></td>'+
+      '<td class="num"><input type="number" min="1" step="0.1" value="'+r.vert+'" data-r="'+r.id+'" data-f="vert"'+(isF?"":" disabled")+'></td>'+
+      '<td class="num"><input type="number" min="0" step="1" value="'+r.attr+'" data-r="'+r.id+'" data-f="attr"'+(isF?"":" disabled")+'></td>'+
+      '<td class="num"><input type="number" min="0" step="0.1" value="'+r.gb+'" data-r="'+r.id+'" data-f="gb"'+(isF?" disabled":"")+'></td>'+
+      '<td><label class="chk"><input type="checkbox" data-r="'+r.id+'" data-f="sync"'+(r.sync?" checked":"")+(isF?"":" disabled")+'></label></td>'+
+      '<td class="num"><input type="number" step="0.5" value="'+r.growth+'" data-r="'+r.id+'" data-f="growth"></td>'+
+      '<td class="num out" data-o="size">-</td><td class="num out" data-o="cred">-</td><td class="num out" data-o="cost">-</td>'+
+      '<td><button class="x noprint" title="Remove row" aria-label="Remove row" onclick="delRow('+r.id+')">&times;</button></td>';
+    tb.appendChild(tr);
+  });
+}
+function opt(v,l,cur){ return '<option value="'+v+'"'+(v===cur?" selected":"")+'>'+l+'</option>'; }
+function esc(s){ return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c])); }
+function num(v){ const n = parseFloat(v); return isFinite(n)?n:0; }
+
+/* ---------- input wiring ---------- */
+document.addEventListener("input", handle);
+document.addEventListener("change", handle);
+function handle(e){
+  const t = e.target; if(!t.dataset) return;
+  let touched = false;
+  if(t.dataset.r){
+    const r = rows.find(x=>x.id === +t.dataset.r); if(!r) return;
+    const f = t.dataset.f;
+    if(f === "name") r.name = t.value;
+    else if(f === "type"){ r.type = t.value; drawRows(); }
+    else if(f === "sync") r.sync = t.checked;
+    else r[f] = num(t.value);
+    touched = true;
+  }
+  if(t.dataset.g){
+    const g = t.dataset.g, k = t.dataset.k;
+    S[g][k] = (t.type === "checkbox") ? t.checked : num(t.value);
+    touched = true;
+  }
+  if(touched){
+    calc(); save();
+  }
+}
+
+/* ---------- model ---------- */
+function bytesPerFeature(v,a,sync){
+  const M = S.model;
+  return (v*M.bytesPerVertex + a*M.bytesPerAttr + M.rowOverhead)
+         * M.indexFactor * (sync ? M.syncFactor : 1) * M.calibration;
+}
+function rowMB(r,m){
+  const g = Math.pow(1 + (r.growth||0)/100, m);
+  if(r.type === "feature") return (r.feat*g*bytesPerFeature(r.vert,r.attr,r.sync))/1048576;
+  return r.gb*g*1024;
+}
+function rowCredits(r,m){
+  const mb = rowMB(r,m);
+  if(r.type === "feature") return mb/10*RATE.featurePer10MB;
+  return mb/1024*(r.type === "imagery" ? RATE.imageryPerGB : RATE.filePerGB);
+}
+function txMonthly(){
+  const t = S.txm;
+  return t.geocodes/1000*RATE.geocodePer1k + t.prints*RATE.printJob
+       + t.optRoutes*RATE.optRoute + t.simpleRoutes*RATE.simpleRoute
+       + t.tiles/10000*RATE.tilePer10k + t.notebookHrs*RATE.notebookHr
+       + t.demoReq/1000*RATE.demoPer1k;
+}
+function txOnce(){
+  const t = S.txo;
+  return t.geocodes/1000*RATE.geocodePer1k + t.tiles/10000*RATE.tilePer10k + t.notebookHrs*RATE.notebookHr;
+}
+function includedAnnual(){
+  let c = 0; USER_TYPES.forEach(([k,l,cr])=>{ c += (S.users[k]||0)*cr; }); return c;
+}
+function availableAnnual(){
+  return S.supply.useBalance ? S.supply.balance : includedAnnual() + S.supply.purchased;
+}
+
+/* ---------- calculate ---------- */
+function calc(){
+  const months = Math.max(1, Math.round(S.supply.months||1));
+  const price = S.supply.price, prem = S.fds.premium;
+  const trs = document.querySelectorAll("#layers tbody tr");
+
+  let mb1 = 0, cred1 = 0, featMB1 = 0;
+  rows.forEach((r,i)=>{
+    const mb = rowMB(r,0);
+    let c = rowCredits(r,0);
+    if(r.type === "feature"){ featMB1 += mb; if(prem) c = 0; }
+    mb1 += mb; cred1 += c;
+    const tr = trs[i]; if(!tr) return;
+    tr.querySelector('[data-o="size"]').textContent = fmtSize(mb);
+    tr.querySelector('[data-o="cred"]').textContent = (r.type === "feature" && prem) ? "covered" : fmt(c,1);
+    tr.querySelector('[data-o="cost"]').textContent = (r.type === "feature" && prem) ? "-" : "$"+fmt(c*price,2);
+  });
+  document.getElementById("tSize").textContent = fmtSize(mb1);
+  document.getElementById("tCred").textContent = fmt(cred1,1);
+  document.getElementById("tCost").textContent = "$"+fmt(cred1*price,2);
+
+  const txm = txMonthly(), txo = txOnce();
+  const series = [];
+  let totF = 0, totFl = 0, totIm = 0, totT = 0;
+  for(let m = 0; m < months; m++){
+    let f = 0, fl = 0, im = 0;
+    rows.forEach(r=>{
+      const c = rowCredits(r,m);
+      if(r.type === "feature") f += c;
+      else if(r.type === "imagery") im += c;
+      else fl += c;
+    });
+    const t = txm + (m === 0 ? txo : 0);
+    totF += f; totFl += fl; totIm += im; totT += t;
+    series.push({m:m+1, f:prem?0:f, fRaw:f, fl:fl, im:im, i:fl+im, t:t, total:(prem?0:f)+fl+im+t});
+  }
+  const avail = availableAnnual();
+
+  // cumulative within subscription year
+  let cum = 0, exhaust = null, yearTotals = [];
+  series.forEach((p,idx)=>{
+    if(idx % 12 === 0) cum = 0;
+    cum += p.total; p.cum = cum;
+    const y = Math.floor(idx/12);
+    yearTotals[y] = (yearTotals[y]||0) + p.total;
+    if(exhaust === null && cum > avail) exhaust = idx+1;
+  });
+
+  const steady = series.length ? series[0].total : 0;
+  const yr1 = yearTotals[0]||0;
+
+  setKPI("k1", fmtSize(mb1), "Modeled storage at month 1",
+    rows.filter(r=>r.type==="feature").length+" feature layers, "+rows.filter(r=>r.type!=="feature").length+" file or imagery items");
+  setKPI("k2", fmt(steady,0), "Credits per month at month 1", "$"+fmt(steady*price,2)+" per month");
+  setKPI("k3", fmt(yr1,0), "Credits in subscription year 1",
+    "$"+fmt(yr1*price,0)+" if purchased at $"+price.toFixed(2)+" per credit");
+
+  const head = avail - yr1;
+  setKPI("k4", fmt(avail,0), "Available credits per year",
+    head >= 0 ? fmt(head,0)+" credits of headroom in year 1"
+              : fmt(-head,0)+" credit shortfall, about $"+fmt(-head*price,0),
+    head >= 0 ? (head/Math.max(avail,1) > 0.35 ? "good" : "warn") : "bad");
+
+  const inc = document.getElementById("incOut");
+  if(inc) inc.value = fmt(includedAnnual(),0)+" credits";
+  const bal = document.getElementById("balInput");
+  if(bal) bal.disabled = !S.supply.useBalance;
+  const note = document.getElementById("fdsNote");
+  if(note) note.textContent = prem
+    ? "Feature storage is covered by the fixed subscription and shows as covered in the table. File storage, imagery and all transactions still consume credits."
+    : "Feature storage bills at 2.4 credits per 10 MB per month, up to 500 GB of feature data.";
+
+  // breakdown
+  const totI = totFl + totIm;
+  const grand = (prem?0:totF) + totI + totT;
+  const bd = document.getElementById("breakdown");
+  bd.innerHTML = brow("Feature storage", prem?0:totF, grand, price, prem?"covered by Premium":"")
+    + brow("File storage", totFl, grand, price, "")
+    + brow("Imagery storage", totIm, grand, price, "")
+    + brow("Transactions and analysis", totT, grand, price, "")
+    + '<tr><td style="font-weight:650;border-top:1px solid var(--accent)">Total over '+months+' months</td>'
+    + '<td style="font-weight:650;border-top:1px solid var(--accent)">'+fmt((prem?0:totF)+totI+totT,0)+' credits &nbsp; $'+fmt(((prem?0:totF)+totI+totT)*price,0)+'</td></tr>';
+
+  const pf = document.getElementById("pfds");
+  const stdCost = totF*price;
+  pf.innerHTML =
+    brow2("Feature storage on Standard, over "+months+" months", totF, price)
+  + brow2("Everything that bills the same either way", totI+totT, price)
+  + '<tr><td style="font-weight:650;border-top:1px solid var(--accent)">Credit spend Premium would remove</td>'
+  + '<td style="font-weight:650;border-top:1px solid var(--accent)">'+fmt(totF,0)+' credits &nbsp; $'+fmt(stdCost,0)+'</td></tr>';
+
+  renderTiers(stdCost, months, price, featMB1);
+
+  chartData = {series, avail, months, price, exhaust};
+  drawChart1(); drawChart2();
+  save();
+}
+function brow(label, c, grand, price, note){
+  const pct = grand > 0 ? (c/grand*100) : 0;
+  return '<tr><td>'+label+(note?' <span style="color:var(--dim-2)">'+note+'</span>':'')+'</td>'+
+         '<td>'+fmt(c,0)+' credits &nbsp; <span style="color:var(--dim-2)">'+pct.toFixed(0)+'%</span> &nbsp; $'+fmt(c*price,0)+'</td></tr>';
+}
+function brow2(label, c, price, note){
+  return '<tr><td>'+label+(note?' <span style="color:var(--dim-2)">'+note+'</span>':'')+'</td>'+
+         '<td>'+fmt(c,0)+' credits &nbsp; $'+fmt(c*price,0)+'</td></tr>';
+}
+/* Premium feature data store levels. Monthly list prices and capacities read from
+   esri.com/en-us/arcgis/products/premium-feature-data-store/buy, September 2026.
+   List price, not your price: an EA or a volume agreement will differ. */
+const TIERS = [["m2","M2","entry level",2800,2],
+               ["m3","M3","2x M2 compute",4950,3],
+               ["m4","M4","2x M3, 16x Standard",9500,4]];
+
+function buildTiers(){
+  const tb = document.querySelector("#pfdsTiers tbody");
+  if(!tb || tb.dataset.built) return;
+  let html = '<tr><th>Level</th><th class="num">USD / month</th><th class="num" id="tHdrCost">Over the horizon</th>'
+           + '<th class="num">Break-even feature storage</th></tr>';
+  TIERS.forEach(([k,label,note,listPrice,capTB])=>{
+    html += '<tr><td><strong>'+label+'</strong> <span style="color:var(--dim-2)">'+note+', '+capTB+' TB</span></td>'
+          + '<td class="num"><input type="number" min="0" step="50" value="'+(S.fds[k]||0)+'" data-g="fds" data-k="'+k+'" aria-label="'+label+' price per month"></td>'
+          + '<td class="num" id="tCost-'+k+'">-</td>'
+          + '<td class="num" id="tBE-'+k+'">-</td></tr>';
+  });
+  tb.innerHTML = html;
+  tb.dataset.built = "1";
+}
+
+/* Only the computed cells are rewritten on each recalculation, so a price input
+   keeps focus and caret position while it is being typed into. */
+function renderTiers(stdCost, months, price, featMB1){
+  buildTiers();
+  const vd = document.getElementById("pfdsVerdict");
+  const hdr = document.getElementById("tHdrCost");
+  if(!vd || !hdr) return;
+  hdr.textContent = "Over " + months + " months";
+
+  const featGB = featMB1/1024;
+  const stdCred = stdCost/Math.max(price,0.0001);
+  let best = null, fits = null;
+  TIERS.forEach(([k,label,note,listPrice,capTB])=>{
+    const mo = S.fds[k]||0;
+    const cost = mo*months;
+    const delta = stdCost - cost;                     // positive means Premium is the cheaper line
+    const beCred = mo/Math.max(price,0.0001);         // feature credits per month of equal cost
+    const beGB = beCred/RATE.featurePer10MB*10/1024;
+    if(best === null || cost < best.cost) best = {label:label, cost:cost, delta:delta, beGB:beGB, capTB:capTB};
+    if(fits === null && featGB <= capTB*1024) fits = {label:label, capTB:capTB};
+    const c = document.getElementById("tCost-"+k), b = document.getElementById("tBE-"+k);
+    if(c) c.innerHTML = '$'+fmt(cost,0)+'<br><span style="color:'+(delta>=0?"var(--good)":"var(--bad)")+'">'
+                      + (delta>=0 ? "saves $"+fmt(delta,0) : "+$"+fmt(-delta,0))+'</span>';
+    if(b) b.innerHTML = fmt(beGB,0)+' GB<br><span style="color:var(--dim-2)">'+fmt(beCred,0)+' credits / mo</span>';
+  });
+
+  const where = "You are modeling " + fmtSize(featMB1) + " of feature data, "
+    + fmt(stdCred,0) + " credits and about $" + fmt(stdCost,0) + " over " + months + " months on Standard. ";
+  let verdict;
+  if(featGB > 500){
+    verdict = "That is past the 500 GB ceiling on a Standard feature data store, so Premium is required rather than optional"
+      + (fits ? ", and " + fits.label + " is the smallest level that holds it at " + fits.capTB + " TB." : ", and it exceeds even M4 at 4 TB.");
+  } else if(best.delta >= 0){
+    verdict = best.label + " is the cheaper line item by $" + fmt(best.delta,0) + " over the horizon, on top of giving you "
+      + best.capTB + " TB and dedicated database compute.";
+  } else {
+    verdict = "Standard is cheaper at this volume. " + best.label + " pays for itself once feature storage passes about "
+      + fmt(best.beGB,0) + " GB at $" + price.toFixed(2) + " per credit, and its dedicated compute may justify it well before that.";
+  }
+  vd.innerHTML = where + verdict;
+}
+function copyCode(btn){
+  const pre = btn.closest(".codewrap").querySelector("pre");
+  const txt = pre.textContent;
+  const done = ()=>{ btn.textContent = "Copied"; clearTimeout(copyCode.t);
+                     copyCode.t = setTimeout(()=>{ btn.textContent = "Copy script"; }, 1800); };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(done, ()=>fallbackCopy(txt,done));
+  } else fallbackCopy(txt,done);
+}
+function fallbackCopy(txt,done){
+  const ta = document.createElement("textarea"); ta.value = txt;
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand("copy"); done(); }catch(e){}
+  document.body.removeChild(ta);
+}
+function pasteMeasured(){ const t = document.getElementById("measIn"); t.value = ""; measFlash(""); t.focus(); }
+function measFlash(m){
+  const e = document.getElementById("measMsg"); if(!e) return;
+  e.textContent = m; clearTimeout(measFlash.t);
+  if(m) measFlash.t = setTimeout(()=>{ e.textContent = ""; }, 4000);
+}
+function importMeasured(){
+  const ta = document.getElementById("measIn");
+  const txt = (ta.value||"").trim();
+  if(!txt){ measFlash("Paste the PLANNER lines from the script first."); return; }
+  let added = 0, skipped = 0;
+  txt.split(/\r?\n/).forEach(ln=>{
+    const l = ln.trim(); if(!l) return;
+    const parts = l.split("|").map(x=>x.trim());
+    if(parts.length < 5 || parts[0].toUpperCase() !== "PLANNER"){ skipped++; return; }
+    const name = parts[1];
+    const feat = num(parts[2].replace(/,/g,""));
+    const vert = num(parts[3].replace(/,/g,""));
+    const attr = num(parts[4].replace(/,/g,""));
+    if(!name || feat <= 0){ skipped++; return; }
+    rows.push({id:++uid, name:name, type:"feature", feat:Math.round(feat),
+               vert:Math.max(1,vert), attr:Math.round(attr), gb:0, sync:false, growth:0});
+    added++;
+  });
+  if(added){
+    drawRows(); calc(); save(); ta.value = "";
+    measFlash(added+" measured layer"+(added>1?"s":"")+" added to the table above"+(skipped?", "+skipped+" line"+(skipped>1?"s":"")+" ignored":"")+".");
+    document.querySelector("#layers tbody tr:last-child").scrollIntoView({behavior:"smooth", block:"center"});
+  } else {
+    measFlash("No PLANNER lines found. Copy the lines that start with PLANNER.");
+  }
+}
+
+function setKPI(id,n,l,s,cls){
+  const e = document.getElementById(id);
+  e.className = "kpi"+(cls?" "+cls:"");
+  e.querySelector(".n").textContent = n;
+  e.querySelector(".l").textContent = l;
+  e.querySelector(".s").textContent = s||"";
+}
+function fmt(n,d){ return isFinite(n) ? n.toLocaleString("en-US",{minimumFractionDigits:d||0,maximumFractionDigits:d||0}) : "-"; }
+function fmtSize(mb){
+  if(mb >= 1024) return fmt(mb/1024,2)+" GB";
+  if(mb >= 1) return fmt(mb,1)+" MB";
+  return fmt(mb*1024,0)+" KB";
+}
+
+/* ---------- chart 1: cumulative vs available ---------- */
+function drawChart1(){
+  const {series, avail, exhaust} = chartData;
+  const W = 760, H = 320, pL = 62, pR = 18, pT = 14, pB = 36;
+  const n = series.length;
+  const maxV = Math.max(avail*1.12, ...series.map(p=>p.cum), 1);
+  const X = i => pL + (W-pL-pR)*(n===1?0:i/(n-1));
+  const Y = v => H-pB - (H-pT-pB)*(v/maxV);
+
+  let g = "";
+  for(let t = 0; t <= 4; t++){
+    const v = maxV*t/4, y = Y(v);
+    g += line(pL,y,W-pR,y,"var(--line-2)",1) +
+         '<text x="'+(pL-9)+'" y="'+(y+4)+'" text-anchor="end" font-size="11" fill="var(--dim-2)">'+fmt(v,0)+'</text>';
+  }
+  // year dividers
+  for(let i = 12; i < n; i += 12){
+    g += line(X(i-0.5),pT,X(i-0.5),H-pB,"var(--line)",1,"3 4") +
+         '<text x="'+(X(i-0.5)+5)+'" y="'+(pT+11)+'" font-size="10.5" fill="var(--dim-2)">year '+(i/12+1)+'</text>';
+  }
+  const step = n > 30 ? 6 : (n > 14 ? 3 : 1);
+  for(let i = 0; i < n; i += step)
+    g += '<text x="'+X(i)+'" y="'+(H-14)+'" text-anchor="middle" font-size="11" fill="var(--dim-2)">'+(i+1)+'</text>';
+
+  // area + line, broken at year resets
+  let area = "", path = "";
+  series.forEach((p,i)=>{
+    const brk = (i % 12 === 0);
+    if(brk){
+      if(path) { path += " "; }
+      path += "M"+X(i).toFixed(1)+" "+Y(p.cum).toFixed(1);
+      area += " M"+X(i).toFixed(1)+" "+Y(0).toFixed(1)+" L"+X(i).toFixed(1)+" "+Y(p.cum).toFixed(1);
+    } else {
+      path += " L"+X(i).toFixed(1)+" "+Y(p.cum).toFixed(1);
+      area += " L"+X(i).toFixed(1)+" "+Y(p.cum).toFixed(1);
+      if(i === n-1 || (i+1)%12 === 0) area += " L"+X(i).toFixed(1)+" "+Y(0).toFixed(1)+" Z";
+    }
+  });
+  if(n === 1) area += " L"+X(0).toFixed(1)+" "+Y(0).toFixed(1)+" Z";
+
+  const ay = Y(Math.min(avail,maxV));
+  let marks = "";
+  if(exhaust){
+    const x = X(exhaust-1);
+    marks = line(x,pT,x,H-pB,"var(--bad)",1.5,"4 3") +
+      '<circle cx="'+x+'" cy="'+Y(series[exhaust-1].cum)+'" r="4" fill="var(--bad)"/>' +
+      '<text x="'+(x+7)+'" y="'+(Y(series[exhaust-1].cum)-9)+'" font-size="11.5" fill="var(--bad)">out of credits, month '+exhaust+'</text>';
+  }
+
+  document.getElementById("chart1").innerHTML =
+    '<svg viewBox="0 0 '+W+' '+H+'" id="svg1" role="img" aria-label="Cumulative credit spend by month against available credits">'+
+      '<defs><linearGradient id="fade" x1="0" y1="0" x2="0" y2="1">'+
+      '<stop offset="0%" stop-color="var(--c-file)" stop-opacity=".18"/>'+
+      '<stop offset="100%" stop-color="var(--c-file)" stop-opacity="0"/></linearGradient></defs>'+
+      g +
+      '<path d="'+area.trim()+'" fill="url(#fade)" stroke="none"/>'+
+      '<path d="'+path.trim()+'" fill="none" stroke="var(--c-file)" stroke-width="2.4" stroke-linejoin="round"/>'+
+      line(pL,ay,W-pR,ay,"var(--good)",1.6,"6 4")+
+      '<text x="'+(pL+6)+'" y="'+(ay-7)+'" font-size="11.5" fill="var(--good)">available '+fmt(avail,0)+'</text>'+
+      marks +
+      '<g id="hov1" style="display:none"><line y1="'+pT+'" y2="'+(H-pB)+'" stroke="var(--dim)" stroke-width="1"/>'+
+      '<circle r="4.5" fill="var(--c-file)" stroke="var(--bg)" stroke-width="2"/></g>'+
+      '<rect x="'+pL+'" y="'+pT+'" width="'+(W-pL-pR)+'" height="'+(H-pT-pB)+'" fill="transparent" id="hit1"/>'+
+    '</svg>';
+
+  const svg = document.getElementById("svg1"), hit = document.getElementById("hit1"), hov = document.getElementById("hov1");
+  function at(evt){
+    const r = svg.getBoundingClientRect();
+    const px = (evt.clientX - r.left)/r.width*W;
+    let i = Math.round((px-pL)/((W-pL-pR)/Math.max(n-1,1)));
+    return Math.max(0, Math.min(n-1, i));
+  }
+  hit.addEventListener("mousemove", e=>{
+    const i = at(e), p = series[i];
+    hov.style.display = ""; 
+    hov.querySelector("line").setAttribute("x1",X(i)); hov.querySelector("line").setAttribute("x2",X(i));
+    hov.querySelector("circle").setAttribute("cx",X(i)); hov.querySelector("circle").setAttribute("cy",Y(p.cum));
+    document.getElementById("ro1").innerHTML =
+      "Month <b>"+p.m+"</b>" +
+      " &middot; this month <b>"+fmt(p.total,0)+"</b> credits" +
+      " &middot; year to date <b>"+fmt(p.cum,0)+"</b>" +
+      " &middot; remaining <b style='color:"+(avail-p.cum<0?"var(--bad)":"var(--good)")+"'>"+fmt(avail-p.cum,0)+"</b>" +
+      " &middot; <b>$"+fmt(p.cum*chartData.price,0)+"</b> year to date";
+  });
+  hit.addEventListener("mouseleave", ()=>{
+    hov.style.display = "none";
+    document.getElementById("ro1").textContent = "Hover the chart for month detail.";
+  });
+}
+
+/* ---------- chart 2: stacked monthly ---------- */
+function drawChart2(){
+  const {series} = chartData;
+  const W = 520, H = 320, pL = 58, pR = 12, pT = 14, pB = 36;
+  const n = series.length;
+  const maxV = Math.max(1, ...series.map(p=>p.total));
+  const bw = (W-pL-pR)/n;
+  const Y = v => H-pB-(H-pT-pB)*(v/maxV);
+
+  let g = "";
+  for(let t = 0; t <= 4; t++){
+    const v = maxV*t/4, y = Y(v);
+    g += line(pL,y,W-pR,y,"var(--line-2)",1) +
+         '<text x="'+(pL-9)+'" y="'+(y+4)+'" text-anchor="end" font-size="11" fill="var(--dim-2)">'+fmt(v,0)+'</text>';
+  }
+  let bars = "";
+  series.forEach((p,i)=>{
+    const x = pL + i*bw + bw*0.14, w = Math.max(1.2, bw*0.72);
+    let acc = 0;
+    [["f","var(--c-feature)"],["fl","var(--c-file)"],["im","var(--c-imagery)"],["t","var(--c-trans)"]].forEach(([k,c])=>{
+      const v = p[k]; if(v <= 0) return;
+      const h = (H-pT-pB)*(v/maxV);
+      bars += '<rect x="'+x.toFixed(1)+'" y="'+(Y(acc)-h).toFixed(1)+'" width="'+w.toFixed(1)+'" height="'+h.toFixed(1)+'" fill="'+c+'" data-m="'+i+'"/>';
+      acc += v;
+    });
+  });
+  const step = n > 30 ? 6 : (n > 14 ? 3 : 1);
+  for(let i = 0; i < n; i += step)
+    g += '<text x="'+(pL+i*bw+bw/2)+'" y="'+(H-14)+'" text-anchor="middle" font-size="11" fill="var(--dim-2)">'+(i+1)+'</text>';
+
+  document.getElementById("chart2").innerHTML =
+    '<svg viewBox="0 0 '+W+' '+H+'" id="svg2" role="img" aria-label="Monthly credit spend split by category">'+
+      g+bars+
+      '<rect x="'+pL+'" y="'+pT+'" width="'+(W-pL-pR)+'" height="'+(H-pT-pB)+'" fill="transparent" id="hit2"/>'+
+    '</svg>';
+
+  const svg = document.getElementById("svg2"), hit = document.getElementById("hit2");
+  hit.addEventListener("mousemove", e=>{
+    const r = svg.getBoundingClientRect();
+    const px = (e.clientX - r.left)/r.width*W;
+    const i = Math.max(0, Math.min(n-1, Math.floor((px-pL)/bw)));
+    const p = series[i];
+    document.getElementById("ro2").innerHTML =
+      "Month <b>"+p.m+"</b> &middot; feature <b>"+fmt(p.f,0)+"</b> &middot; file <b>"+fmt(p.fl,0)+
+      "</b> &middot; imagery <b>"+fmt(p.im,0)+"</b> &middot; transactions <b>"+fmt(p.t,0)+
+      "</b> &middot; total <b>"+fmt(p.total,0)+"</b>";
+  });
+  hit.addEventListener("mouseleave", ()=>{ document.getElementById("ro2").textContent = "Hover a bar for the split."; });
+}
+function line(x1,y1,x2,y2,c,w,dash){
+  return '<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="'+c+'" stroke-width="'+w+'"'+(dash?' stroke-dasharray="'+dash+'"':'')+'/>';
+}
+
+/* ---------- export / import / summary ---------- */
+function exportJSON(){
+  const blob = new Blob([JSON.stringify({version:1,saved:new Date().toISOString(),s:S,rows:rows},null,2)],
+    {type:"application/json"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "agol-credit-scenario-"+new Date().toISOString().slice(0,10)+".json";
+  a.click(); URL.revokeObjectURL(a.href);
+  flash("Scenario exported.");
+}
+function importJSON(el){
+  const f = el.files && el.files[0]; if(!f) return;
+  const rd = new FileReader();
+  rd.onload = ()=>{
+    try{
+      const d = JSON.parse(rd.result);
+      if(!d.s || !Array.isArray(d.rows)) throw 0;
+      S = Object.assign(freshState(), d.s);
+      ["users","supply","fds","model","txm","txo"].forEach(g=>{
+        S[g] = Object.assign(JSON.parse(JSON.stringify(DEFAULTS[g])), d.s[g]||{});
+      });
+      rows = d.rows; uid = rows.reduce((m,r)=>Math.max(m,r.id||0),0);
+      buildControls(); drawRows(); calc(); save();
+      flash("Scenario loaded.");
+    }catch(e){ flash("That file could not be read as a scenario."); }
+    el.value = "";
+  };
+  rd.readAsText(f);
+}
+function resetAll(){
+  S = freshState(); seedRows(); buildControls(); drawRows(); calc(); save();
+  flash("Reset to defaults.");
+}
+function copySummary(){
+  const months = Math.round(S.supply.months), price = S.supply.price, prem = S.fds.premium;
+  const {series, avail, exhaust} = chartData;
+  let totF = 0, totFl = 0, totIm = 0, totT = 0;
+  series.forEach(p=>{ totF += p.fRaw; totFl += p.fl; totIm += p.im; totT += p.t; });
+  const yr1 = series.slice(0,12).reduce((a,p)=>a+p.total,0);
+  const L = [
+    "ArcGIS Online credit estimate",
+    "Generated "+new Date().toLocaleDateString(),
+    "",
+    "SUPPLY",
+    "  Available credits per year   "+fmt(avail,0)+(S.supply.useBalance?"  (entered balance)":"  (user types plus purchased)"),
+    "  Feature data store           "+(prem?"Premium, fixed price":"Standard, pay as you go"),
+    "  Planning horizon             "+months+" months",
+    "  Credit price assumed         $"+price.toFixed(2),
+    "",
+    "HOSTED CONTENT",
+    ...rows.map(r=>"  "+r.name.padEnd(30).slice(0,30)+" "+fmtSize(rowMB(r,0)).padStart(10)+"  "+fmt(rowCredits(r,0),1).padStart(8)+" credits/mo"),
+    "  Modeled total at month 1     "+fmtSize(rows.reduce((a,r)=>a+rowMB(r,0),0)),
+    "",
+    "SPEND",
+    "  Month 1                      "+fmt(series[0].total,0)+" credits",
+    "  Subscription year 1          "+fmt(yr1,0)+" credits  (~$"+fmt(yr1*price,0)+")",
+    "  Over "+months+" months"+" ".repeat(Math.max(1,20-String(months).length))+fmt(series.reduce((a,p)=>a+p.total,0),0)+" credits",
+    "",
+    "  Feature storage              "+fmt(prem?0:totF,0)+(prem?"  (covered by Premium)":""),
+    "  File storage                 "+fmt(totFl,0),
+    "  Imagery storage              "+fmt(totIm,0),
+    "  Transactions and analysis    "+fmt(totT,0),
+    "",
+    exhaust ? "  Available credits are exhausted in month "+exhaust+"."
+            : "  Available credits are not exhausted within the horizon.",
+    "",
+    "RATES USED (Esri, Understand credits)",
+    "  Feature storage   2.4 credits per 10 MB per month, calculated hourly",
+    "  File and imagery  1.2 credits per 1 GB per month",
+    "  Geocoding         40 credits per 1,000 stored geocodes",
+    "  doc.arcgis.com/en/arcgis-online/administer/credits.htm",
+    "",
+    "Storage sizes are modeled from geometry, not measured in ArcGIS Online.",
+    "Estimate only. Verify against your organization status dashboard and your Esri agreement."
+  ].join("\n");
+  navigator.clipboard.writeText(L).then(()=>flash("Summary copied."), ()=>{
+    const ta = document.createElement("textarea"); ta.value = L; document.body.appendChild(ta); ta.select();
+    try{ document.execCommand("copy"); flash("Summary copied."); }catch(e){ flash("Copy failed."); }
+    document.body.removeChild(ta);
+  });
+}
+function flash(m){
+  const e = document.getElementById("msg"); e.textContent = m;
+  clearTimeout(flash.t); flash.t = setTimeout(()=>{ e.textContent = ""; }, 3200);
+}
+
+/* ---------- author ---------- */
+(function(){
+  const a = document.getElementById("liLink"); a.href = AUTHOR.linkedin;
+  const img = document.getElementById("authorPhoto"); img.src = AUTHOR.photo;
+  img.onerror = function(){
+    const d = document.createElement("div"); d.className = "avatar"; d.textContent = "BK";
+    d.setAttribute("aria-label","Brian Kingery");
+    img.replaceWith(d);
+  };
+})();
+
+/* ---------- boot ---------- */
+if(!load()){ S = freshState(); seedRows(); }
+buildControls(); drawRows(); calc();
+window.addEventListener("resize", ()=>{ if(chartData){ drawChart1(); drawChart2(); } });
+</script>
+</body>
+</html>
