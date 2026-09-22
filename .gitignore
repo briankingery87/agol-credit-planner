@@ -11,3 +11,12 @@ desktop.ini
 # Local scratch
 *.local.html
 scratch/
+
+# Org exports. Item and credit reports carry item titles, owner usernames and
+# client project names, and this repo is public. publish.bat runs "git add -A",
+# so anything left in the working folder would be pushed. Keep exports outside
+# the repo; this is the second line of defense, not the first.
+*.csv
+*.xlsx
+reports/
+org-reports/

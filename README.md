@@ -11,6 +11,13 @@ browser. Scenarios are kept in `localStorage` and can be exported to JSON.
 
 ## What it does
 
+- Starts from measurement, not assumption. Drop an ArcGIS Online **item report** CSV into section
+  01 and the page reports the real feature and file storage the org is carrying, what it costs per
+  month, storage by item type, the largest items, and how much is sitting in the recycle bin or in
+  content with zero views. Parsed in the browser, never uploaded, never saved to the browser and
+  never written into an exported scenario. Tested against a 25,485-item production export.
+- Prefills the planning table from that same report. Rows built this way carry measured megabytes
+  and are marked **measured**, so the sizing model is bypassed for them entirely.
 - Sizes hosted feature layers from feature count, vertices per feature and attribute field
   count, using an open model whose assumptions are stated on the page.
 - Bills imagery, tile caches, documents, packages and attachments as file or imagery storage
@@ -64,6 +71,47 @@ LICENSE        MIT
 DEPLOY.md      first push and update run order
 publish.bat    one-command commit and push
 ```
+
+## Tests
+
+Two suites, both driving the real page in headless Chromium and asserting against the actual
+functions rather than a reimplementation of them.
+
+`test/harness.js` - 84 assertions on the calculation pipeline: published rate arithmetic, the
+sizing formula, growth compounding, subscription-year resets, the Premium break-even, credit-block
+rounding, the recommendation engine, the measurement parser, state round-trips, and edge cases
+(zero credit price, one-month horizon, partial second year, empty scenario, negative growth).
+
+`test/csv.js` - 62 assertions on the item report reader, using synthetic reports in
+`test/fixtures.js`: quoted commas, doubled quotes, embedded newlines, CRLF, a UTF-8 BOM, thousands
+separators, reordered and differently-cased headers, `(MB)` unit suffixes, recycle-bin and
+zero-view waste detection, per-item credit rating, rejection of a credit report uploaded by
+mistake (including the three preamble lines a real credit report starts with), the verbatim header
+of a real production export, and confirmation that report contents never reach `localStorage` or an
+exported scenario.
+
+### A note on validating against a real org
+
+Run both an item report and a monthly credit report for the same period and compare. On the org
+this was tested against, non-feature storage predicted 869 credits a month against an actual 944,
+an 8% gap explained by the item report being a point-in-time snapshot. Feature storage predicted
+33,029 against an actual 196, because that org is on a Premium feature data store and feature
+storage had left the credit model. Selecting Premium in section 02 brings the prediction back in
+line. If your own numbers are off by two orders of magnitude on feature storage only, that is the
+first thing to check.
+
+```bash
+npm install --no-save playwright
+node test/harness.js
+node test/csv.js
+```
+
+Exits non-zero on any failure. Playwright is a development dependency only; the page itself
+still has none.
+
+What the tests cannot do is validate the sizing model, because there is nothing authoritative
+to compare it against. Only a real published layer can do that. See the note on the sizing
+model above.
 
 ## Local development
 

@@ -123,6 +123,36 @@ textarea{width:100%;font:12px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,mo
 .codebar .lbl{font-size:11px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:var(--dim-2)}
 .codebar button{padding:4px 10px;font-size:12px}
 
+/* org report drop zone */
+.opt{font-size:11px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;
+  color:var(--dim-2);border:1px solid var(--line);border-radius:10px;padding:2px 8px}
+.opts{display:grid;gap:8px}
+.opt-row{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;cursor:pointer;
+  border:1px solid var(--line);border-radius:5px;background:var(--panel-2)}
+.opt-row.on{border-color:var(--accent);background:var(--row-hover)}
+.opt-row input{margin:2px 0 0;accent-color:var(--accent);flex:none}
+.opt-row strong{display:block;font-size:13px;font-weight:650}
+.opt-row em{display:block;font-style:normal;font-size:12px;color:var(--dim);margin-top:2px}
+.lvl{display:flex;align-items:center;gap:10px;margin-top:11px}
+.lvl label{font-size:12.5px;color:var(--dim);flex:none}
+button.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent);font-weight:600}
+button.primary:hover{background:var(--accent-2);border-color:var(--accent-2);color:var(--on-accent)}
+.caret{font-size:10px;opacity:.7;margin-left:2px}
+#presetBtns{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+#presetBtns[hidden]{display:none}
+[aria-expanded="true"] .caret{display:inline-block;transform:rotate(180deg)}
+.tag{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--c-feature);border:1px solid var(--c-feature);border-radius:9px;padding:1px 6px;
+  white-space:nowrap;vertical-align:1px}
+.drop{border:1.5px dashed var(--line);border-radius:6px;background:var(--panel-2);
+  padding:26px 20px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s}
+.drop:hover,.drop:focus-visible{border-color:var(--accent);background:var(--panel)}
+.drop.over{border-color:var(--accent);background:var(--row-hover);border-style:solid}
+.drop-i strong{display:block;font-size:14px;font-weight:650}
+.drop-i span{display:block;font-size:12.5px;color:var(--dim-2);margin-top:4px}
+.bar{height:5px;border-radius:3px;background:var(--line-2);overflow:hidden;margin-top:5px}
+.bar i{display:block;height:100%;background:var(--c-feature)}
+
 /* slide-out scope panel */
 .scrim{position:fixed;inset:0;background:rgba(21,32,43,.34);z-index:60;
   opacity:0;pointer-events:none;transition:opacity .18s}
@@ -341,7 +371,7 @@ footer strong{color:var(--dim)}
          both against the credits your organization actually has.</p>
       <p>The published Esri rates are fixed and are used as-is. The part that needs judgment is how
          large your hosted data will be once it lands in ArcGIS Online. That part is an engineering
-         estimate, not an Esri figure, so section 02 includes a script that measures your real
+         estimate, not an Esri figure, so section 03 includes a script that measures your real
          geometry in ArcGIS Pro and loads it straight into the table. Nothing is sent anywhere;
          everything runs in your browser.</p>
     </div>
@@ -357,8 +387,61 @@ footer strong{color:var(--dim)}
 </header>
 
 <!-- 1 -->
+<section id="sec-org" class="noprint">
+  <h2><span class="num">01</span> Start from your org <span class="opt">optional</span></h2>
+  <div class="h2rule"></div>
+  <div class="sub two">
+    <p>Everything below this section is a forecast. This one is a measurement. Export an item report
+       from your organization and drop it here, and the page reads the real storage your org is
+       carrying right now, what it costs per month at published rates, and how much of it is sitting
+       in content nobody has opened.</p>
+    <p>In ArcGIS Online: <strong>Organization &gt; Status &gt; Reports &gt; Create report &gt;
+       Item report</strong>, then download the CSV. The file is parsed in your browser and never
+       leaves this page, it is not saved to this browser, and it is not written into your exported
+       scenario. Reload the page and it is gone.</p>
+  </div>
+
+  <div class="drop noprint" id="orgDrop" tabindex="0" role="button"
+       aria-label="Upload an ArcGIS Online item report CSV">
+    <div class="drop-i">
+      <strong>Drop your item report CSV here</strong>
+      <span>or click to choose a file</span>
+    </div>
+    <input type="file" id="orgFile" accept=".csv,text/csv" hidden onchange="orgPick(this)">
+  </div>
+  <p class="msg" id="orgMsg" style="margin:10px 0 0"></p>
+
+  <div id="orgOut" hidden>
+    <div class="kpis" style="margin-top:18px">
+      <div class="kpi" id="o1"><div class="n">-</div><div class="l">Feature storage</div><div class="s"></div></div>
+      <div class="kpi" id="o2"><div class="n">-</div><div class="l">File storage</div><div class="s"></div></div>
+      <div class="kpi" id="o3"><div class="n">-</div><div class="l">Storage credits per month</div><div class="s"></div></div>
+      <div class="kpi" id="o4"><div class="n">-</div><div class="l">Recoverable</div><div class="s"></div></div>
+    </div>
+    <div class="grid2">
+      <div class="panel">
+        <h3>Storage by item type</h3>
+        <p class="ph">Measured, from the report. Feature and file storage summed per type.</p>
+        <table class="ref"><tbody id="orgTypes"></tbody></table>
+      </div>
+      <div class="panel">
+        <h3>Largest items</h3>
+        <p class="ph">The top of this list is where optimization pays off first.</p>
+        <table class="ref"><tbody id="orgTop"></tbody></table>
+      </div>
+    </div>
+    <div class="band" id="orgWaste" style="margin-top:16px"></div>
+    <div class="band" id="orgReconcile" style="margin-top:12px;border-left-color:var(--accent)"></div>
+    <div class="btnrow noprint">
+      <button class="ghost" onclick="orgClear()">Clear report</button>
+      <span style="font-size:12.5px;color:var(--dim-2)">Nothing from this report is saved or exported.</span>
+    </div>
+  </div>
+</section>
+
+<!-- 2 -->
 <section id="sec-supply">
-  <h2><span class="num">01</span> Your credit supply</h2>
+  <h2><span class="num">02</span> Your credit supply</h2>
   <div class="h2rule"></div>
   <div class="sub">
     <p>Every subscription includes a pool of credits shared by the organization, sized by the user
@@ -386,19 +469,13 @@ footer strong{color:var(--dim)}
       <h3>Feature data store</h3>
       <p class="ph">Which storage model your subscription is on.</p>
       <div class="f" id="fds"></div>
-      <p style="font-size:12.5px;color:var(--dim);margin:14px 0 0">
-        Standard is the default and includes up to 500 GB of feature data storage charged with
-        credits, pay as you go. Premium replaces that with a fixed subscription price and dedicated
-        database resources. Premium covers <em>feature</em> storage only. File storage, imagery
-        storage and every transaction still bill the same way in both.
-      </p>
     </div>
   </div>
 </section>
 
-<!-- 2 -->
+<!-- 3 -->
 <section id="sec-content">
-  <h2><span class="num">02</span> What you are hosting</h2>
+  <h2><span class="num">03</span> What you are hosting</h2>
   <div class="h2rule"></div>
   <div class="sub two">
     <p>One row per hosted item. Feature layers are sized from geometry and attributes, because vertex
@@ -416,14 +493,14 @@ footer strong{color:var(--dim)}
       <th style="min-width:180px" class="tip" tabindex="0" data-tip="Whatever you will recognize it by. This label only appears in this tool and in the copied summary.">Item<span class="q">?</span></th>
       <th style="width:105px" class="tip" tabindex="0" data-tip="Feature bills at 2.4 credits per 10 MB per month. Imagery and File both bill at 1.2 credits per 1 GB per month. Attachments, PDFs, packages, vector tile layers and offline map areas are all File.">Type<span class="q">?</span></th>
       <th class="num tip" tabindex="0" data-tip="Row count in the layer. For a layer you already have, this is the record count in ArcGIS Pro or on the item page.">Features<span class="q">?</span></th>
-      <th class="num tip" tabindex="0" data-tip="Average points making up each shape. Points are 1. Simple rectangular parcels run 5 to 15, typical assessor parcels 15 to 40, generalized county boundaries in the hundreds, detailed hydrography or soils in the thousands. Measure yours with the script below the table.">Vertices<br>per feature<span class="q">?</span></th>
+      <th class="num tip" tabindex="0" data-tip="Average points making up each shape, and the dominant term in a hosted feature layer&apos;s size. Typical ranges: any point layer 1 &middot; simple building footprints 5 to 15 &middot; platted subdivision parcels 5 to 15 &middot; typical county assessor parcels 15 to 40 &middot; rural metes-and-bounds parcels 30 to 80 &middot; road centerlines 10 to 60 &middot; utility mains and services 4 to 30 &middot; zoning and land use 20 to 120 &middot; grid or fishnet cells 5 &middot; wetlands, soils and detailed hydrography 100 to 2,000 &middot; generalized county or municipal boundaries 500 to 5,000 &middot; watersheds, coastline and raw digitized boundaries 2,000 to 50,000. These are indicative bands for sanity-checking, not published figures. Measure your own with Scope data.">Vertices<br>per feature<span class="q">?</span></th>
       <th class="num tip" tabindex="0" data-tip="Number of attribute fields, excluding the ObjectID and the shape fields. Counts the fields you actually publish, so a layer trimmed before publishing is smaller here.">Attribute<br>fields<span class="q">?</span></th>
       <th class="num tip" tabindex="0" data-tip="For Imagery and File rows only. The size on disk of the imagery, cache, documents or attachments you will store. Ignored for Feature rows.">Size GB<span class="q">?</span></th>
       <th class="tip" tabindex="0" data-tip="Enable Sync, offline use, and change tracking all retain extra rows and indexes, so the stored size grows beyond the source data. Applies a 1.70x multiplier to the modeled size.">Sync<span class="q">?</span></th>
       <th class="num tip r" tabindex="0" data-tip="Compounding monthly growth in this layer. Use it for anything being actively collected or appended. Leave at 0 for a static reference layer.">Growth<br>%/mo<span class="q">?</span></th>
       <th class="num tip r" tabindex="0" data-tip="Modeled size in ArcGIS Online at month 1, after index and storage overhead. This is an engineering estimate, not an Esri figure. Measure your real geometry with the script below the table to firm it up.">Modeled<br>size<span class="q">?</span></th>
       <th class="num tip r" tabindex="0" data-tip="Recurring credits per month to keep this item hosted, at month 1. Storage is charged hourly, so deleting content mid-month stops the charge immediately.">Credits<br>/mo<span class="q">?</span></th>
-      <th class="num tip r" tabindex="0" data-tip="Monthly credits converted at the credit price you set in section 01. Credit pricing varies by agreement, so treat this as indicative until your Esri quote confirms it.">$/mo<span class="q">?</span></th>
+      <th class="num tip r" tabindex="0" data-tip="Monthly credits converted at the credit price you set in section 02. Credit pricing varies by agreement, so treat this as indicative until your Esri quote confirms it.">$/mo<span class="q">?</span></th>
       <th style="width:26px"></th>
     </tr></thead>
     <tbody></tbody>
@@ -434,14 +511,17 @@ footer strong{color:var(--dim)}
   </table>
   </div>
   <div class="btnrow noprint">
-    <button onclick="addRow()">Add new row</button>
-    <button onclick="openScope()" aria-haspopup="dialog">Scope data</button>
+    <button class="primary" onclick="addRow()">Add new row</button>
+    <button class="primary" onclick="openScope()" aria-haspopup="dialog">Scope data</button>
+    <button class="primary" onclick="prefillFromOrg()">Prefill from item report</button>
     <span class="sep"></span>
-    <span style="font-size:12px;color:var(--dim-2);margin-right:2px">Presets</span>
-    <span id="presetBtns"></span>
+    <button class="ghost" id="presetToggle" aria-expanded="false" aria-controls="presetBtns"
+            onclick="togglePresets()">Presets <span class="caret">&#9662;</span></button>
     <span class="sep"></span>
     <button class="ghost" onclick="clearRows()">Clear all</button>
+    <span class="msg" id="rowMsg"></span>
   </div>
+  <div id="presetBtns" class="noprint" hidden></div>
 
   <div class="band" style="margin-top:16px">
     <strong>What the modeled size is built from.</strong>
@@ -455,9 +535,9 @@ footer strong{color:var(--dim)}
   </div>
 </section>
 
-<!-- 3 -->
+<!-- 4 -->
 <section id="sec-transactions">
-  <h2><span class="num">03</span> Transactions and analysis</h2>
+  <h2><span class="num">04</span> Transactions and analysis</h2>
   <div class="h2rule"></div>
   <div class="sub two">
     <p>These are the line items that surprise people. Storing a few million polygons is cheap and
@@ -475,9 +555,9 @@ footer strong{color:var(--dim)}
 </section>
 
 
-<!-- 4 -->
+<!-- 5 -->
 <section id="sec-burn">
-  <h2><span class="num">04</span> Burn</h2>
+  <h2><span class="num">05</span> Burn</h2>
   <div class="h2rule"></div>
   <div class="sub two">
     <p>The left chart runs cumulative spend inside each subscription year against your available
@@ -548,12 +628,12 @@ footer strong{color:var(--dim)}
 </section>
 
 
-<!-- 5 -->
+<!-- 6 -->
 <section id="sec-advice">
-  <h2><span class="num">05</span> What to do about it</h2>
+  <h2><span class="num">06</span> What to do about it</h2>
   <div class="h2rule"></div>
   <div class="sub two">
-    <p>Section 04 says what the plan costs. This one says what to buy. There are only two levers:
+    <p>Section 05 says what the plan costs. This one says what to buy. There are only two levers:
        purchase more credits, or move feature storage out of the credit model onto a Premium feature
        data store and pay a fixed subscription instead. Both are priced below against the same
        scenario, so the comparison is like for like.</p>
@@ -587,9 +667,9 @@ footer strong{color:var(--dim)}
   </div>
 </section>
 
-<!-- 6 -->
+<!-- 7 -->
 <section id="sec-scenario" class="noprint">
-  <h2><span class="num">06</span> Save, share, reuse</h2>
+  <h2><span class="num">07</span> Save, share, reuse</h2>
   <div class="h2rule"></div>
   <div class="sub two">
     <p>Your scenario is kept in this browser automatically. Export it to a JSON file to version it
@@ -611,19 +691,16 @@ footer strong{color:var(--dim)}
   </div>
 </section>
 
-<!-- 7 -->
+<!-- 8 -->
 <section id="sec-reference">
-  <h2><span class="num">07</span> Published rates and reference values</h2>
+  <h2><span class="num">08</span> Published rates and reference values</h2>
   <div class="h2rule"></div>
-  <div class="sub two">
-    <p>The left table is Esri's published credit consumption, used unchanged by this tool. It comes
-       from Understand credits unless a row links somewhere else, so any number here can be checked
-       at the source before it goes into a proposal.</p>
-    <p>The right table is a starting band for vertex counts by data type, assembled from typical
-       production datasets. Treat it as a way to sanity-check a number you entered, not as a source
-       to cite. Measure your own where the answer matters.</p>
+  <div class="sub one">
+    <p>Esri's published credit consumption, used unchanged by this tool. It comes from Understand
+       credits unless a row links somewhere else, so any number here can be checked at the source
+       before it goes into a proposal.</p>
   </div>
-  <div class="grid2">
+  <div>
     <div class="panel">
       <h3>Esri credit rates</h3>
       <p class="ph">All from <a href="https://doc.arcgis.com/en/arcgis-online/administer/credits.htm" target="_blank" rel="noopener">Understand credits</a> and used unchanged, except the four rows that link to a different page. Rates change; check the source before a number goes into a budget.</p>
@@ -642,24 +719,6 @@ footer strong{color:var(--dim)}
         <tr><td><a href="https://doc.arcgis.com/en/arcgis-online/create-maps/specify-the-runtime-of-a-notebook.htm" target="_blank" rel="noopener">Notebooks, Advanced with GPU</a></td><td>30 credits / hour</td></tr>
         <tr><td><a href="https://doc.arcgis.com/en/arcgis-online/analyze/credits-analysis-mv.htm" target="_blank" rel="noopener">ModelBuilder analysis session</a></td><td>50 credits / hour</td></tr>
         <tr><td>3D object layer from textured multipatch</td><td>1 credit / 1,000 features</td></tr>
-      </tbody></table>
-    </div>
-    <div class="panel">
-      <h3>Typical vertex counts</h3>
-      <p class="ph">Indicative ranges for sanity-checking, not published figures.</p>
-      <table class="ref"><tbody>
-        <tr><td>Any point layer: addresses, assets, field collection</td><td>1</td></tr>
-        <tr><td>Building footprints, simple</td><td>5 to 15</td></tr>
-        <tr><td>Parcels, platted subdivision</td><td>5 to 15</td></tr>
-        <tr><td>Parcels, typical county assessor mix</td><td>15 to 40</td></tr>
-        <tr><td>Parcels, rural and metes-and-bounds heavy</td><td>30 to 80</td></tr>
-        <tr><td>Road centerline segments</td><td>10 to 60</td></tr>
-        <tr><td>Utility mains and service lines</td><td>4 to 30</td></tr>
-        <tr><td>Zoning and land use polygons</td><td>20 to 120</td></tr>
-        <tr><td>Grid or fishnet index cells</td><td>5</td></tr>
-        <tr><td>Wetlands, soils, detailed hydrography</td><td>100 to 2,000</td></tr>
-        <tr><td>Generalized county or municipal boundaries</td><td>500 to 5,000</td></tr>
-        <tr><td>Watersheds, coastline, raw digitized boundaries</td><td>2,000 to 50,000</td></tr>
       </tbody></table>
     </div>
   </div>
@@ -723,7 +782,7 @@ footer strong{color:var(--dim)}
         </div>
 <pre><span class="c"># Measure feature classes for the AGOL Credit Planner.</span>
 <span class="c"># Copy the PLANNER lines from the output and paste them</span>
-<span class="c"># into the planner, section 02.</span>
+<span class="c"># into the planner, section 03.</span>
 <span class="k">import</span> arcpy, statistics
 
 FCS = [
@@ -805,7 +864,7 @@ const USER_TYPES = [
 /* ---- sizing model constants ----
    Not published by Esri. These are engineering estimates and they are the numbers
    the modeled size column is built from. Edit them here if your data behaves
-   differently; section 02 discloses them on the page. */
+   differently; section 03 discloses them on the page. */
 const DEFAULTS = {
   users:{creator:3,professional:1,proplus:0,mobile:0,contributor:0,editor:5},
   supply:{purchased:0, useBalance:false, balance:0, months:24, price:0.12},
@@ -882,6 +941,37 @@ function field(group,key,label,opts){
 }
 function head(t){ const h = document.createElement("div"); h.className = "head"; h.textContent = t; return h; }
 
+/* Standard is the default and is stated as an option rather than implied by an
+   unchecked box. The level select only exists while Premium is chosen. */
+function buildFds(){
+  const d = document.getElementById("fds");
+  if(!d) return;
+  const prem = !!S.fds.premium;
+  let h = '<div class="span opts">'
+    + '<label class="opt-row' + (prem ? '' : ' on') + '">'
+    +   '<input type="radio" name="fdsMode" value="0" data-g="fds" data-k="premium" data-bool'
+    +   (prem ? '' : ' checked') + '>'
+    +   '<span><strong>Standard feature data store</strong>'
+    +   '<em>Up to 500 GB of feature data, charged with credits, pay as you go.</em></span>'
+    + '</label>'
+    + '<label class="opt-row' + (prem ? ' on' : '') + '">'
+    +   '<input type="radio" name="fdsMode" value="1" data-g="fds" data-k="premium" data-bool'
+    +   (prem ? ' checked' : '') + '>'
+    +   '<span><strong>Premium feature data store</strong>'
+    +   '<em>Fixed subscription, dedicated database compute. Feature storage leaves the credit model.</em></span>'
+    + '</label></div>';
+  if(prem){
+    h += '<div class="span lvl"><label for="fdsTier">Level</label>'
+       + '<select id="fdsTier" data-g="fds" data-k="tier" data-str>'
+       + TIERS.map(([k,label,note,price,cap]) =>
+           '<option value="'+k+'"'+(S.fds.tier === k ? ' selected' : '')+'>'
+           + label+' &middot; '+cap+' TB &middot; $'+fmt(price,0)+'/mo list</option>').join("")
+       + '</select></div>';
+  }
+  h += '<div class="span" id="fdsNote" style="font-size:12px;color:var(--dim-2);padding-top:9px"></div>';
+  d.innerHTML = h;
+}
+
 function buildControls(){
   const tb0 = document.querySelector("#pfdsTiers tbody");
   if(tb0){ tb0.dataset.built = ""; tb0.innerHTML = ""; }
@@ -906,12 +996,7 @@ function buildControls(){
   f = field("supply","price","Price per credit, USD",{min:0,step:0.01}); s.append(f[0],f[1]);
 
   // fds
-  const d = document.getElementById("fds"); d.innerHTML = "";
-  f = field("fds","premium","Premium feature data store",{type:"check"}); d.append(f[0],f[1]);
-  const note = document.createElement("div"); note.className = "span";
-  note.style.cssText = "font-size:12px;color:var(--dim-2);padding-top:4px";
-  note.id = "fdsNote";
-  d.append(note);
+  buildFds();
 
   // transactions
   const m = document.getElementById("txm"); m.innerHTML = "";
@@ -933,7 +1018,6 @@ function buildControls(){
 
   // preset buttons
   const pb = document.getElementById("presetBtns"); pb.innerHTML = "";
-  pb.style.cssText = "display:inline-flex;flex-wrap:wrap;gap:7px";
   Object.keys(PRESETS).forEach(k=>{
     const b = document.createElement("button"); b.className = "ghost"; b.textContent = PRESETS[k].name;
     b.onclick = ()=>{ const d2 = Object.assign({},PRESETS[k]); d2.id = ++uid; rows.push(d2); drawRows(); calc(); };
@@ -942,6 +1026,54 @@ function buildControls(){
 }
 
 /* ---------- rows ---------- */
+function togglePresets(){
+  const pb = document.getElementById("presetBtns"), b = document.getElementById("presetToggle");
+  const open = pb.hidden;
+  pb.hidden = !open;
+  b.setAttribute("aria-expanded", open ? "true" : "false");
+}
+function rowFlash(m){
+  const e = document.getElementById("rowMsg"); if(!e) return;
+  e.textContent = m; clearTimeout(rowFlash.t);
+  rowFlash.t = setTimeout(()=>{ e.textContent = ""; }, 5000);
+}
+
+/* Build the table from a real item report. Rows carry measured megabytes, so the
+   sizing model is bypassed entirely for them. Feature and file storage are split
+   because they bill at very different rates. */
+let orgPrefillPending = false;
+function prefillFromOrg(){
+  if(!ORG){
+    orgPrefillPending = true;
+    rowFlash("Choose your item report, then the table fills in.");
+    document.getElementById("orgFile").click();
+    return;
+  }
+  applyOrgPrefill();
+}
+function applyOrgPrefill(){
+  const o = ORG; if(!o) return;
+  rows = []; uid = 0;
+  if(o.featMB > 0){
+    rows.push({id:++uid, name:"Hosted feature layers", type:"feature",
+               feat:0, vert:1, attr:0, gb:0, mb:o.featMB, sync:false, growth:0});
+  }
+  const fileTypes = o.types.filter(t=>t.fi > 0).sort((a,b)=>b.fi-a.fi);
+  const keep = fileTypes.slice(0, 8), rest = fileTypes.slice(8);
+  keep.forEach(t=>{
+    rows.push({id:++uid, name:t.type, type:/image|imagery|raster|scene/i.test(t.type) ? "imagery" : "file",
+               feat:0, vert:1, attr:0, gb:0, mb:t.fi, sync:false, growth:0});
+  });
+  const restMB = rest.reduce((a,t)=>a+t.fi, 0);
+  if(restMB > 0){
+    rows.push({id:++uid, name:"Other file storage, "+rest.length+" types", type:"file",
+               feat:0, vert:1, attr:0, gb:0, mb:restMB, sync:false, growth:0});
+  }
+  drawRows(); calc(); save();
+  rowFlash(rows.length + " rows built from " + (o.fileName||"the item report")
+    + ". Sizes are measured, so the model is bypassed. Set growth per row.");
+  document.getElementById("sec-content").scrollIntoView({behavior:"smooth", block:"start"});
+}
 function addRow(){
   rows.push({id:++uid,name:"New layer",type:"feature",feat:10000,vert:20,attr:15,gb:0,sync:false,growth:0});
   drawRows(); calc();
@@ -952,16 +1084,19 @@ function delRow(id){ rows = rows.filter(r=>r.id!==id); drawRows(); calc(); }
 function drawRows(){
   const tb = document.querySelector("#layers tbody"); tb.innerHTML = "";
   rows.forEach(r=>{
-    const isF = r.type === "feature";
+    const meas = r.mb > 0;
+    const isF = r.type === "feature" && !meas;
+    const off = meas ? " disabled" : "";
     const tr = document.createElement("tr");
     tr.innerHTML =
-      '<td><input type="text" value="'+esc(r.name)+'" data-r="'+r.id+'" data-f="name"></td>'+
+      '<td><input type="text" value="'+esc(r.name)+'" data-r="'+r.id+'" data-f="name">'
+        + (meas ? ' <span class="tag">measured</span>' : '')+'</td>'+
       '<td><select data-r="'+r.id+'" data-f="type">'+
         opt("feature","Feature",r.type)+opt("imagery","Imagery",r.type)+opt("file","File",r.type)+'</select></td>'+
       '<td class="num"><input type="number" min="0" step="1" value="'+r.feat+'" data-r="'+r.id+'" data-f="feat"'+(isF?"":" disabled")+'></td>'+
       '<td class="num"><input type="number" min="1" step="0.1" value="'+r.vert+'" data-r="'+r.id+'" data-f="vert"'+(isF?"":" disabled")+'></td>'+
       '<td class="num"><input type="number" min="0" step="1" value="'+r.attr+'" data-r="'+r.id+'" data-f="attr"'+(isF?"":" disabled")+'></td>'+
-      '<td class="num"><input type="number" min="0" step="0.1" value="'+r.gb+'" data-r="'+r.id+'" data-f="gb"'+(isF?" disabled":"")+'></td>'+
+      '<td class="num"><input type="number" min="0" step="0.1" value="'+(meas?(r.mb/1024).toFixed(2):r.gb)+'" data-r="'+r.id+'" data-f="gb"'+((isF||meas)?" disabled":"")+'></td>'+
       '<td><label class="chk"><input type="checkbox" data-r="'+r.id+'" data-f="sync"'+(r.sync?" checked":"")+(isF?"":" disabled")+'></label></td>'+
       '<td class="num"><input type="number" step="0.5" value="'+r.growth+'" data-r="'+r.id+'" data-f="growth"></td>'+
       '<td class="num out" data-o="size">-</td><td class="num out" data-o="cred">-</td><td class="num out" data-o="cost">-</td>'+
@@ -990,7 +1125,11 @@ function handle(e){
   }
   if(t.dataset.g){
     const g = t.dataset.g, k = t.dataset.k;
-    S[g][k] = (t.type === "checkbox") ? t.checked : num(t.value);
+    if(t.dataset.str !== undefined)            S[g][k] = t.value;          // select or radio
+    else if(t.dataset.bool !== undefined)      S[g][k] = t.value === "1";  // radio pair
+    else if(t.type === "checkbox")             S[g][k] = t.checked;
+    else                                       S[g][k] = num(t.value);
+    if(g === "fds"){ buildFds(); if(ORG) renderOrg(); }
     touched = true;
   }
   if(touched){
@@ -1006,6 +1145,9 @@ function bytesPerFeature(v,a,sync){
 }
 function rowMB(r,m){
   const g = Math.pow(1 + (r.growth||0)/100, m);
+  /* A row carrying a measured size came from a real item report. Measurement beats
+     the model, so the geometry inputs are ignored and disabled for that row. */
+  if(r.mb > 0) return r.mb*g;
   if(r.type === "feature") return (r.feat*g*bytesPerFeature(r.vert,r.attr,r.sync))/1048576;
   return r.gb*g*1024;
 }
@@ -1103,9 +1245,12 @@ function calc(){
   const bal = document.getElementById("balInput");
   if(bal) bal.disabled = !S.supply.useBalance;
   const note = document.getElementById("fdsNote");
-  if(note) note.textContent = prem
-    ? "Feature storage is covered by the fixed subscription and shows as covered in the table. File storage, imagery and all transactions still consume credits."
-    : "Feature storage bills at 2.4 credits per 10 MB per month, up to 500 GB of feature data.";
+  if(note){
+    const t = TIERS.filter(x=>x[0] === S.fds.tier)[0] || TIERS[0];
+    note.textContent = prem
+      ? t[1]+" holds "+t[4]+" TB and lists at $"+fmt(t[3],0)+" per month. Feature storage shows as covered in the table below. File storage, imagery and every transaction still consume credits."
+      : "Feature storage bills at 2.4 credits per 10 MB per month, up to 500 GB of feature data. Above that ceiling Premium is required.";
+  }
 
   // breakdown
   const totI = totFl + totIm;
@@ -1261,7 +1406,7 @@ function renderAdvice(yearStd, yearNoFeat, months, price, avail, featMB1){
   const tight = Math.max(...yearStd.map(y=>y||0));
   nt.innerHTML = "Tightest subscription year on Standard is " + fmt(tight,0) + " credits against "
     + fmt(avail,0) + " available. " + (years > 1 ? "Shortfalls are summed across all " + years + " subscription years, because unused credits do not carry over. " : "")
-    + "This accounts for your included credits, so the crossover here sits a little above the raw break-even in section 04.";
+    + "This accounts for your included credits, so the crossover here sits a little above the raw break-even in section 05.";
 
   if(!win){
     vd.innerHTML = '<p style="margin:0;font-size:14px"><strong>Nothing here holds this much data.</strong></p>'
@@ -1306,6 +1451,244 @@ function renderAdvice(yearStd, yearNoFeat, months, price, avail, featMB1){
   vd.innerHTML = '<p style="margin:0;font-size:14.5px;font-weight:650;letter-spacing:-.01em">'+lead+'</p>'
     + '<ul style="margin:12px 0 0;padding-left:17px;color:var(--dim);font-size:13px;line-height:1.6">'
     + bullets.map(b=>'<li style="margin-bottom:6px">'+b+'</li>').join('') + '</ul>';
+}
+
+/* ---------- org item report ---------- */
+/* Parsed in the browser and held in memory only. Never written to localStorage,
+   never included in an exported scenario, gone on reload. Item reports carry
+   titles and owner names, so they are treated as the user's data, not ours. */
+let ORG = null;
+
+/* RFC 4180 style reader: handles quoted fields, embedded commas and newlines,
+   doubled quotes, CRLF and a UTF-8 BOM. */
+function parseCSV(text){
+  if(text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+  const rows = []; let row = [], val = "", q = false;
+  for(let i = 0; i < text.length; i++){
+    const c = text[i];
+    if(q){
+      if(c === '"'){
+        if(text[i+1] === '"'){ val += '"'; i++; }
+        else q = false;
+      } else val += c;
+    } else if(c === '"'){ q = true; }
+    else if(c === ','){ row.push(val); val = ""; }
+    else if(c === '\n'){ row.push(val); rows.push(row); row = []; val = ""; }
+    else if(c === '\r'){ /* handled by the \n */ }
+    else val += c;
+  }
+  if(val.length || row.length){ row.push(val); rows.push(row); }
+  return rows.filter(r => r.length > 1 || (r[0]||"").trim() !== "");
+}
+
+/* Header matching is forgiving: case, spaces, punctuation and a trailing unit
+   such as "(MB)" are all ignored, so a column named "File Storage Size (MB)"
+   still matches "File Storage Size". */
+const norm = h => String(h||"").toLowerCase().replace(/\(.*?\)/g,"").replace(/[^a-z0-9]/g,"");
+const COLS = {
+  title:      ["title","itemtitle","name"],
+  type:       ["itemtype","type"],
+  owner:      ["owner","username"],
+  fileMB:     ["filestoragesize","filestorage","filesizemb","filesize"],
+  featMB:     ["featurestoragesize","featurestorage","featuresizemb"],
+  hosted:     ["ishostedservice","hostedservice","ishosted"],
+  bin:        ["inrecyclebin","recyclebin"],
+  views:      ["viewcounts","viewcount","views","numviews"],
+  lastViewed: ["datelastviewed","lastviewed"],
+  created:    ["datecreated","created"]
+};
+function mapHeaders(hdr){
+  const idx = {}, seen = hdr.map(norm);
+  Object.keys(COLS).forEach(k=>{
+    for(const alias of COLS[k]){
+      const i = seen.indexOf(alias);
+      if(i !== -1){ idx[k] = i; return; }
+    }
+  });
+  return idx;
+}
+const cell = (r,i) => (i === undefined || r[i] === undefined) ? "" : String(r[i]).trim();
+const cnum = (r,i) => { const n = parseFloat(cell(r,i).replace(/,/g,"")); return isFinite(n) ? n : 0; };
+const cbool = (r,i) => /^(true|yes|y|1)$/i.test(cell(r,i));
+
+function parseItemReport(text){
+  const rows = parseCSV(text);
+  if(rows.length < 2) return {error:"That file has no data rows."};
+  const head = rows[0].map(norm);
+  /* A credit report also has "File Storage" and "Feature Storage" columns, but they
+     hold credits, not megabytes. Reading one as an item report would silently report
+     credit counts as storage, so reject it by its own distinctive columns first. */
+  if(head.indexOf("creditsconsumedby") !== -1 || head.indexOf("starttime") !== -1)
+    return {error:"That looks like a credit report, not an item report. Create an Item report instead: Organization > Status > Reports > Create report > Item report."};
+  const idx = mapHeaders(rows[0]);
+  if(idx.fileMB === undefined && idx.featMB === undefined)
+    return {error:"No File Storage Size or Feature Storage Size column found. Is this an item report?"};
+  if(idx.title === undefined && idx.type === undefined)
+    return {error:"No Title or Item Type column found. Is this an item report?"};
+  const items = [];
+  for(let i = 1; i < rows.length; i++){
+    const r = rows[i];
+    if(!r.length || r.every(c => String(c).trim() === "")) continue;
+    const featMB = cnum(r, idx.featMB), fileMB = cnum(r, idx.fileMB);
+    items.push({
+      title: cell(r, idx.title) || "(untitled)",
+      type:  cell(r, idx.type)  || "Unknown",
+      owner: cell(r, idx.owner),
+      featMB: featMB, fileMB: fileMB, totalMB: featMB + fileMB,
+      hosted: cbool(r, idx.hosted),
+      bin:    /^(yes|true|y|1)$/i.test(cell(r, idx.bin)),
+      views:  idx.views === undefined ? null : cnum(r, idx.views),
+      lastViewed: cell(r, idx.lastViewed)
+    });
+  }
+  const missing = ["title","type","fileMB","featMB","bin","views"]
+    .filter(k => idx[k] === undefined);
+  return {items: items, missing: missing, columns: rows[0].length};
+}
+
+/* Feature storage bills at 2.4 per 10 MB and file storage at 1.2 per GB, which is
+   roughly a 200x difference per megabyte. Waste has to be rated per item by its own
+   storage type; blanket-rating it at either rate is wrong by orders of magnitude. */
+function itemCredits(i){
+  return i.featMB/10*RATE.featurePer10MB + i.fileMB/1024*RATE.filePerGB;
+}
+function summarizeItems(items){
+  const live = items.filter(i => !i.bin);
+  const sum = (a, f) => a.reduce((t,i)=>t+f(i), 0);
+  const featMB = sum(live, i=>i.featMB), fileMB = sum(live, i=>i.fileMB);
+  const cred = featMB/10*RATE.featurePer10MB + fileMB/1024*RATE.filePerGB;
+
+  const byType = {};
+  live.forEach(i=>{
+    const t = byType[i.type] || (byType[i.type] = {type:i.type, n:0, mb:0, fe:0, fi:0});
+    t.n++; t.mb += i.totalMB; t.fe += i.featMB; t.fi += i.fileMB;
+  });
+  const types = Object.values(byType).filter(t=>t.mb > 0).sort((a,b)=>b.mb-a.mb);
+
+  const top = live.filter(i=>i.totalMB > 0).sort((a,b)=>b.totalMB-a.totalMB).slice(0,10);
+
+  const binned = items.filter(i => i.bin);
+  const binMB  = sum(binned, i=>i.totalMB);
+  const unused = live.filter(i => i.views === 0 && i.totalMB > 0);
+  const unusedMB = sum(unused, i=>i.totalMB);
+  const wasteMB = binMB + unusedMB;
+
+  return {
+    n: items.length, nLive: live.length,
+    featMB: featMB, fileMB: fileMB, totalMB: featMB + fileMB, cred: cred,
+    types: types, top: top,
+    binned: binned.length, binMB: binMB,
+    unused: unused.length, unusedMB: unusedMB,
+    wasteMB: wasteMB,
+    wasteCred: sum(binned, itemCredits) + sum(unused, itemCredits),
+    // on Premium only the file half of the waste is costing credits
+    wasteCredFile: (sum(binned, i=>i.fileMB) + sum(unused, i=>i.fileMB))/1024*RATE.filePerGB
+  };
+}
+
+function orgPick(el){
+  const f = el.files && el.files[0];
+  if(f) orgRead(f);
+  el.value = "";
+}
+function orgRead(f){
+  if(!/\.csv$/i.test(f.name)){ orgFlash("That is not a .csv file."); return; }
+  const rd = new FileReader();
+  rd.onload = ()=>{
+    let res;
+    try{ res = parseItemReport(String(rd.result)); }
+    catch(e){ orgFlash("That file could not be read as a CSV."); return; }
+    if(res.error){ orgFlash(res.error); return; }
+    if(!res.items.length){ orgFlash("No item rows found in that file."); return; }
+    ORG = summarizeItems(res.items);
+    ORG.fileName = f.name; ORG.missing = res.missing;
+    renderOrg();
+    if(orgPrefillPending){ orgPrefillPending = false; applyOrgPrefill(); }
+  };
+  rd.onerror = ()=>orgFlash("That file could not be read.");
+  rd.readAsText(f);
+}
+function orgFlash(m){
+  const e = document.getElementById("orgMsg");
+  e.style.color = "var(--bad)"; e.textContent = m;
+  clearTimeout(orgFlash.t); orgFlash.t = setTimeout(()=>{ e.textContent = ""; }, 6000);
+}
+function orgClear(){
+  ORG = null;
+  document.getElementById("orgOut").hidden = true;
+  document.getElementById("sec-org").classList.add("noprint");
+  const e = document.getElementById("orgMsg"); e.textContent = "";
+  document.getElementById("orgDrop").focus();
+}
+
+function renderOrg(){
+  const o = ORG; if(!o) return;
+  const price = S.supply.price, prem = !!S.fds.premium;
+  document.getElementById("orgOut").hidden = false;
+  // an empty upload prompt is noise on paper; the assessment itself is worth printing
+  document.getElementById("sec-org").classList.remove("noprint");
+  const msg = document.getElementById("orgMsg");
+  msg.style.color = "var(--good)";
+  msg.textContent = o.fileName + ": " + fmt(o.n,0) + " items read"
+    + (o.missing && o.missing.length ? ". Columns not found: " + o.missing.join(", ") + "." : ".");
+
+  /* On a Premium feature data store feature storage does not consume credits. Reporting
+     it at the Standard rate anyway overstates a large org by two orders of magnitude,
+     so the measured burn follows whichever data store is selected in section 02. */
+  const featCred = prem ? 0 : o.featMB/10*RATE.featurePer10MB;
+  const fileCred = o.fileMB/1024*RATE.filePerGB;
+  const cred = featCred + fileCred;
+
+  setKPI("o1", fmtSize(o.featMB), "Feature storage, measured",
+    prem ? "covered by the Premium subscription"
+         : fmt(featCred,0) + " credits per month");
+  setKPI("o2", fmtSize(o.fileMB), "File and imagery storage, measured",
+    fmt(fileCred,0) + " credits per month");
+  setKPI("o3", fmt(cred,0), "Storage credits per month",
+    "$" + fmt(cred*price,2) + " per month at $" + price.toFixed(2) + " per credit"
+    + (prem ? ", plus the Premium subscription" : ""));
+  const wasteCred = prem ? o.wasteCredFile : o.wasteCred;
+  setKPI("o4", fmtSize(o.wasteMB), "In the recycle bin or never opened",
+    o.wasteMB > 0 ? "about " + fmt(wasteCred*12,0) + " credits a year" : "nothing obvious to reclaim",
+    o.wasteMB > 0 ? (o.wasteMB/Math.max(o.totalMB,1) > 0.15 ? "bad" : "warn") : "good");
+
+  const maxT = o.types.length ? o.types[0].mb : 1;
+  document.getElementById("orgTypes").innerHTML = o.types.slice(0,12).map(t=>
+    '<tr><td>'+esc(t.type)+' <span style="color:var(--dim-2)">'+t.n+' item'+(t.n>1?'s':'')+'</span>'
+    + '<div class="bar"><i style="width:'+(t.mb/maxT*100).toFixed(1)+'%"></i></div></td>'
+    + '<td>'+fmtSize(t.mb)+'</td></tr>').join("")
+    || '<tr><td colspan="2" style="color:var(--dim-2)">No items carrying storage.</td></tr>';
+
+  document.getElementById("orgTop").innerHTML = o.top.map(i=>
+    '<tr><td>'+esc(i.title)+' <span style="color:var(--dim-2)">'+esc(i.type)+'</span></td>'
+    + '<td>'+fmtSize(i.totalMB)+' <span style="color:var(--dim-2)">'
+    + fmt(prem ? i.fileMB/1024*RATE.filePerGB : itemCredits(i),1)+' cr/mo</span></td></tr>').join("")
+    || '<tr><td colspan="2" style="color:var(--dim-2)">No items carrying storage.</td></tr>';
+
+  const w = document.getElementById("orgWaste");
+  const bits = [];
+  if(o.binned) bits.push("<strong>"+fmt(o.binned,0)+"</strong> item"+(o.binned>1?"s":"")
+    +" sitting in the recycle bin holding "+fmtSize(o.binMB)
+    +". Deleted content keeps billing until it is purged.");
+  if(o.unused) bits.push("<strong>"+fmt(o.unused,0)+"</strong> item"+(o.unused>1?"s":"")
+    +" with zero views holding "+fmtSize(o.unusedMB)
+    +". Worth a look before the next renewal.");
+  w.innerHTML = bits.length
+    ? "<strong>Recoverable spend.</strong> " + bits.join(" ")
+      + " Storage is charged hourly, so it stops the moment the item is gone."
+    : "<strong>Nothing obvious to reclaim.</strong> No items in the recycle bin and none with zero"
+      + " views carrying storage. The measured figures above are your real recurring floor.";
+  w.style.borderLeftColor = bits.length ? "var(--warn)" : "var(--good)";
+
+  const rec = document.getElementById("orgReconcile");
+  if(rec){
+    rec.innerHTML = "<strong>Check this against your credit report.</strong> Pull a monthly credit"
+      + " report for the same period and compare its org-level storage rows against "
+      + fmt(cred,0) + " credits a month. If the actual feature storage figure is a tiny fraction of "
+      + fmt(o.featMB/10*RATE.featurePer10MB,0) + ", the org is on a Premium feature data store and"
+      + " you should select it in section 02, which takes feature storage out of the credit model here."
+      + (prem ? " Premium is currently selected, so feature storage is excluded above." : "");
+  }
 }
 
 /* ---------- scope drawer ---------- */
@@ -1646,6 +2029,31 @@ function flash(m){
     d.setAttribute("aria-label","Brian Kingery");
     img.replaceWith(d);
   };
+})();
+
+/* ---------- org drop zone wiring ---------- */
+(function(){
+  const d = document.getElementById("orgDrop");
+  if(!d) return;
+  const fi = document.getElementById("orgFile");
+  d.addEventListener("click", ()=>fi.click());
+  d.addEventListener("keydown", e=>{
+    if(e.key === "Enter" || e.key === " "){ e.preventDefault(); fi.click(); }
+  });
+  ["dragenter","dragover"].forEach(ev=>d.addEventListener(ev, e=>{
+    e.preventDefault(); e.stopPropagation(); d.classList.add("over");
+  }));
+  ["dragleave","drop"].forEach(ev=>d.addEventListener(ev, e=>{
+    e.preventDefault(); e.stopPropagation(); d.classList.remove("over");
+  }));
+  d.addEventListener("drop", e=>{
+    const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+    if(f) orgRead(f);
+  });
+  // the whole page would otherwise navigate away when a file is dropped beside the zone
+  ["dragover","drop"].forEach(ev=>window.addEventListener(ev, e=>{
+    if(!d.contains(e.target)) e.preventDefault();
+  }));
 })();
 
 /* ---------- boot ---------- */
