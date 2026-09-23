@@ -190,6 +190,37 @@ const {chromium} = require('playwright');
     truthy('over M4 says nothing holds it',
       /Nothing here holds this much data/i.test(document.getElementById('advVerdict').textContent));
 
+    /* ---------- Premium is only ever a feature-storage lever ---------- */
+    // A huge imagery layer is file-class storage. Premium cannot touch it, so
+    // "stay on Standard" is correct and the page has to say why.
+    reset();
+    S.supply.months = 24; S.supply.price = 0.12; S.users.creator = 8; S.users.editor = 0;
+    addRow({type:'feature', feat:45000, vert:24, attr:50});
+    addRow({type:'feature', feat:900000, vert:24, attr:28});
+    addRow({type:'imagery', gb:500000});
+    run();
+    const imgV = document.getElementById('advVerdict').textContent;
+    const imgP = document.getElementById('pfdsVerdict').textContent;
+    ok('imagery bills at the file rate', chartData.series[0].im, 500000*RATE.filePerGB, 1e-6);
+    ok('premium does not zero imagery', (()=>{ S.fds.premium = true; run();
+        const v = chartData.series[0].im; S.fds.premium = false; run(); return v; })(),
+       500000*RATE.filePerGB, 1e-6);
+    truthy('imagery-dominated plan still recommends Standard', /stay on Standard/i.test(imgV));
+    truthy('recommendation names the cost driver', /What is driving it/i.test(imgV));
+    truthy('recommendation explains why Premium lost', /only touches feature storage/i.test(imgV));
+    truthy('premium panel says Premium is not the lever', /not the lever here/i.test(imgP));
+    truthy('absurd block counts suggest an agreement', /account manager/i.test(imgV));
+
+    // and the opposite case still recommends moving
+    reset();
+    S.supply.months = 24; S.supply.price = 0.12;
+    addRow({type:'feature', feat:120000000, vert:24, attr:28});
+    run();
+    truthy('feature-dominated plan recommends Premium',
+      /Move to M2/i.test(document.getElementById('advVerdict').textContent));
+    truthy('no spurious "not the lever" when feature dominates',
+      !/not the lever/i.test(document.getElementById('pfdsVerdict').textContent));
+
     /* ---------- 14. measured import parser ---------- */
     reset(); run();
     const before = rows.length;
