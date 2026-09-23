@@ -138,7 +138,9 @@ const {chromium} = require('playwright');
     const beGB = beCred/RATE.featurePer10MB*10/1024;
     ok('M2 break-even credits/mo', beCred, 23333.3333, 1e-3);
     ok('M2 break-even GB', beGB, 94.9436, 0.001);
-    ok('TIERS prices', TIERS.map(t=>t[3]), [2800,4950,9500]);
+    ok('TIERS prices are the published list prices', TIERS.map(t=>t[3]), [2800,4950,9500]);
+    ok('Premium prices are not user state', S.fds.m2, undefined);
+    ok('credit price is the Esri list price', DEFAULTS.supply.price, 0.12);
     ok('TIERS capacities TB', TIERS.map(t=>t[4]), [2,3,4]);
 
     /* ---------- 11. credit blocks round up ---------- */
@@ -207,7 +209,7 @@ const {chromium} = require('playwright');
 
     /* ---------- 15. state round trip ---------- */
     reset();
-    S.supply.months = 18; S.supply.price = 0.09; S.fds.m2 = 3100;
+    S.supply.months = 18; S.supply.price = 0.09;
     addRow({type:'feature', feat:12345, vert:7, attr:9, sync:true, growth:2.5});
     run();
     const snapshot = JSON.stringify({s:S, rows:rows});
@@ -220,7 +222,7 @@ const {chromium} = require('playwright');
     run();
     ok('round trip keeps months', S.supply.months, 18);
     ok('round trip keeps price', S.supply.price, 0.09);
-    ok('round trip keeps M2 price', S.fds.m2, 3100);
+    ok('round trip keeps the data store choice', S.fds.tier, 'm2');
     ok('round trip keeps sync flag', rows[0].sync, true);
     ok('round trip keeps growth', rows[0].growth, 2.5);
 
@@ -287,6 +289,18 @@ const {chromium} = require('playwright');
     reset();
     const mixed2 = addRow({type:'feature', feat:1000, vert:10, attr:10, gb:500});
     ok('feature row ignores GB input', rowMB(mixed2,0), 1000*bytesPerFeature(10,10,false)/1048576, 1e-9);
+
+    /* ---------- money formatting ---------- */
+    ok('money adds a dollar sign and separators', money(1234567), '$1,234,567');
+    ok('money with cents', money(0.12,2), '$0.12');
+    ok('money of zero', money(0), '$0');
+    ok('money of a non-number', money(NaN), '-');
+
+    /* ---------- horizon control ---------- */
+    reset(); S.supply.months = 24; run();
+    setHorizon(36);
+    ok('setHorizon updates state', S.supply.months, 36);
+    ok('setHorizon recalculates the series', chartData.series.length, 36);
 
     /* ---------- 17. formatting ---------- */
     ok('fmtSize under 1 GB stays MB', fmtSize(512), '512.0 MB');

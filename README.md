@@ -15,8 +15,9 @@ New ArcGIS Online administrators who have just been handed a credit balance and 
 what drains it, and experienced administrators doing capacity planning for a renewal or a
 proposal. The page opens with two labeled paths, one for auditing an organization that already
 exists and one for scoping something that does not, and a glossary covering every term it uses.
-Sections are marked **input**, **result** or **reference** so it is obvious what you fill in and
-what the tool works out.
+Sections are marked **input** or **result** so it is obvious what you fill in and what the tool
+works out, and the reference material lives in three side panels reachable from the top bar:
+**Rates & prices**, **Accuracy** and **Glossary**.
 
 ## What it does
 
@@ -51,6 +52,28 @@ of the three reports was dropped. Tested against a 25,485-item production export
   measured feature, vertex and field counts.
 - Uses the same series colors as the ArcGIS Online organization status dashboard, so the planner's
   charts and your real usage charts read as one set.
+
+## Where your data goes
+
+Nowhere. The page is one HTML file with no back end, no analytics and no dependencies, and it
+makes **no network requests at all** after it loads. A report you drop in is read by the browser's
+local file reader, summarized into totals, and held in a JavaScript variable until the tab closes.
+It is never written to browser storage and never appears in an exported scenario. The test suite
+asserts all three of those.
+
+Your *scenario* does persist, to `localStorage` in that browser on that device only, so you can
+close the tab and come back. It is not shared, not synced and not visible to anyone else, and a
+private window starts empty. Refreshing does not clear it; **Reset to defaults** does.
+
+One honest caveat: if you use **Prefill from item report**, the rows it creates are part of your
+scenario and therefore do persist and do export. They carry item *type* names and sizes only, never
+item titles or owner names.
+
+## Published figures are not editable
+
+Credit price and the Premium level prices are published by Esri and are fixed in the page rather
+than exposed as inputs. A rate that can drift silently makes every dollar figure downstream
+unverifiable. They live in one place in the source: `DEFAULTS.supply.price` and the `TIERS` array.
 
 ## A note on Premium pricing
 
@@ -89,7 +112,7 @@ publish.bat    one-command commit and push
 Two suites, both driving the real page in headless Chromium and asserting against the actual
 functions rather than a reimplementation of them.
 
-`test/harness.js` - 84 assertions on the calculation pipeline: published rate arithmetic, the
+`test/harness.js` - 92 assertions on the calculation pipeline: published rate arithmetic, the
 sizing formula, growth compounding, subscription-year resets, the Premium break-even, credit-block
 rounding, the recommendation engine, the measurement parser, state round-trips, and edge cases
 (zero credit price, one-month horizon, partial second year, empty scenario, negative growth).

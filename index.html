@@ -66,7 +66,7 @@ header.top h1{font-size:30px;font-weight:650;letter-spacing:-.02em;margin:8px 0 
 .byline .lnk{font-size:12.5px;margin-top:5px}
 .byline img.tg{width:172px;height:auto;flex:none}
 .lede{display:grid;grid-template-columns:1.55fr 1fr;gap:34px;margin-top:14px;align-items:start}
-.lede.one{grid-template-columns:1fr;max-width:118ch}
+.lede.one{grid-template-columns:1fr}
 .lede p{margin:0 0 10px;color:var(--dim);font-size:14.5px}
 .lede p strong{color:var(--text);font-weight:600}
 .callout{
@@ -170,6 +170,22 @@ textarea{width:100%;font:12px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,mo
 .opt-row em{display:block;font-style:normal;font-size:12px;color:var(--dim);margin-top:2px}
 .lvl{display:flex;align-items:center;gap:10px;margin-top:11px}
 .lvl label{font-size:12.5px;color:var(--dim);flex:none}
+.horizon{padding:4px 0 2px}
+.hz-row{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.hz-row input{width:78px;font-size:19px;font-weight:650;text-align:center;padding:7px 8px;
+  border:1px solid var(--accent);border-radius:4px;background:var(--panel)}
+.hz-u{font-size:13px;color:var(--dim)}
+.hz-btns{display:flex;gap:4px;margin-left:auto}
+.hz-b{padding:5px 10px;font-size:12px;border:1px solid var(--line);border-radius:3px;
+  background:var(--panel-2);color:var(--dim);cursor:pointer}
+.hz-b:hover{background:var(--panel-3);color:var(--text);border-color:var(--line)}
+.hz-b.on{background:var(--accent);border-color:var(--accent);color:var(--on-accent);font-weight:600}
+.hz-n{font-size:12px;color:var(--dim-2);margin:9px 0 0;line-height:1.5}
+.fixed-rate{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;margin-top:15px;
+  padding-top:13px;border-top:1px solid var(--line-2)}
+.fr-l{font-size:13px;color:var(--dim)}
+.fr-v{font-size:15px;font-weight:650;font-variant-numeric:tabular-nums}
+.fr-n{font-size:12px;color:var(--dim-2);flex-basis:100%}
 button.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent);font-weight:600}
 button.primary:hover{background:var(--accent-2);border-color:var(--accent-2);color:var(--on-accent)}
 .caret{font-size:10px;opacity:.7;margin-left:2px}
@@ -212,6 +228,11 @@ button.primary:hover{background:var(--accent-2);border-color:var(--accent-2);col
 .gl-t:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
 .gloss dt{font-size:13.5px;font-weight:650;margin:0 0 4px}
 .gloss dd{margin:0;font-size:13px;color:var(--dim);line-height:1.62}
+.dsec{margin:26px 0 8px;font-size:11px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:var(--accent)}
+.drawer-body .dsec:first-child{margin-top:0}
+.dnote{font-size:12.5px;color:var(--dim);margin:11px 0 0;line-height:1.6}
+.drawer-body h3{margin:0 0 4px;font-size:14px;font-weight:650}
+.drawer-body .ph{font-size:12.5px;color:var(--dim-2);margin:0 0 12px}
 @media (prefers-reduced-motion:reduce){.drawer,.scrim{transition:none}}
 input:focus,select:focus,button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 input[readonly]{background:#eef1f5;color:var(--dim)}
@@ -229,7 +250,7 @@ button.ghost{background:transparent;color:var(--dim)}
 button.ghost:hover{background:var(--panel-3);color:var(--text);border-color:var(--line)}
 button.x{border:none;background:none;color:var(--dim-2);padding:2px 5px;font-size:17px;line-height:1}
 button.x:hover{background:none;color:var(--bad)}
-.btnrow{display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin-top:14px}
+.btnrow{display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin-top:14px;position:relative}
 .btnrow .sep{width:1px;height:20px;background:var(--line);margin:0 4px}
 .msg{font-size:12.5px;color:var(--good)}
 
@@ -249,6 +270,9 @@ td.out{color:var(--accent-2);font-variant-numeric:tabular-nums}
 
 /* tooltips */
 .tip{cursor:help}
+.btnwrap{display:inline-block;position:relative;cursor:default}
+.btnwrap::after{top:calc(100% + 5px);left:0;width:270px;max-width:calc(100vw - 52px)}
+.btnwrap.r::after{left:auto;right:0}
 .tip .q{
   display:inline-block;width:13px;height:13px;line-height:13px;text-align:center;border-radius:50%;
   border:1px solid var(--dim-2);color:var(--dim-2);font-size:9.5px;margin-left:5px;vertical-align:1px;font-weight:700;
@@ -290,7 +314,8 @@ svg{display:block;width:100%;height:auto;overflow:visible}
 .ref.prose td:first-child{width:38%}
 .ref.tiers th{font-size:11px}
 .ref.tiers td.num,.ref.tiers th.num{text-align:right}
-.ref.tiers input[type=number]{width:74px;display:inline-block;padding:4px 6px;font-size:12.5px}
+.ref.tiers tr.sel{background:var(--row-hover)}
+.ref.tiers tr.sel td{border-color:var(--accent)}
 .ref.tiers td:first-child{width:34%}
 pre{
   margin:0;background:var(--code-bg);border:1px solid var(--line);border-radius:4px;padding:13px 14px;
@@ -307,12 +332,23 @@ footer{margin-top:28px;padding-top:18px;border-top:1px solid var(--line);font-si
 footer .cols{display:grid;grid-template-columns:repeat(3,1fr);gap:26px}
 footer p{margin:0 0 9px}
 footer strong{color:var(--dim)}
+.fcontact{display:flex;gap:14px;align-items:flex-start;margin-top:22px;padding-top:18px;
+  border-top:1px solid var(--line)}
+.fcontact img{width:42px;height:42px;border-radius:50%;object-fit:cover;flex:none;
+  border:1.5px solid var(--line)}
+.fcontact p{margin:0 0 5px;font-size:12.5px}
+.fcontact p:last-child{margin-bottom:0;color:var(--dim-2)}
+.fcontact strong{color:var(--text)}
 
 @media (max-width:1000px){
   .lede,.sub,.sub.two,.grid3,.grid2,.charts,footer .cols,.tracks{grid-template-columns:1fr}
   .kpis{grid-template-columns:1fr 1fr}
   .tip::after{width:210px}
   .secnav{margin:0 -16px 20px;padding:0 16px}
+  /* narrow screens: anchor a button tooltip to the row, not the button, so it
+     cannot start halfway across and run off the right edge */
+  .btnwrap{position:static}
+  .btnwrap::after,.btnwrap.r::after{left:0;right:auto;width:calc(100vw - 48px);max-width:none}
 }
 @media print{
   @page{size:letter portrait;margin:0.45in}
@@ -434,8 +470,9 @@ footer strong{color:var(--dim)}
     <li><a href="#sec-burn"><b>05</b>Burn</a></li>
     <li><a href="#sec-advice"><b>06</b>What to do</a></li>
     <li><a href="#sec-scenario"><b>07</b>Save</a></li>
-    <li><a href="#sec-reference"><b>08</b>Rates</a></li>
-    <li class="gl"><a href="#" onclick="openGloss();return false;">Glossary</a></li>
+    <li class="gl"><a href="#" onclick="openRates();return false;">Rates &amp; prices</a></li>
+    <li><a href="#" onclick="openAcc();return false;">Accuracy</a></li>
+    <li><a href="#" onclick="openGloss();return false;">Glossary</a></li>
   </ol>
 </nav>
 
@@ -464,7 +501,7 @@ footer strong{color:var(--dim)}
       </ol>
     </div>
   </div>
-  <p class="foot"><strong>Everything runs in your browser.</strong> No account, no sign-in, no upload. Your scenario is kept in this browser and can be exported to a file; uploaded reports are never saved anywhere. Sections 01 to 04 are what you put in, 05 and 06 are what comes out, and 08 is the rate card everything is built on.</p>
+  <p class="foot"><strong>Everything runs in your browser.</strong> No account, no sign-in, and nothing is uploaded: this page makes no network requests at all once it has loaded. A report you drop in is read by the browser, summarized, and held in memory until you close the tab. Your scenario saves to this browser on this device so you can come back to it. Sections 01 to 04 are what you put in, 05 and 06 are what comes out, and <a href="#" onclick="openRates();return false;">Rates &amp; prices</a> is the card everything is built on.</p>
 </div>
 
 <!-- 1 -->
@@ -478,9 +515,12 @@ footer strong{color:var(--dim)}
        in content nobody has opened.</p>
     <p>In ArcGIS Online: <strong>Organization &gt; Status &gt; Reports &gt; Create report</strong>.
        The <strong>item report</strong> gives you the storage picture below; the
-       <strong>member report</strong> fills in your credit supply in section 02. Both are parsed in
-       your browser and never leave this page, are not saved to this browser, and are not written
-       into your exported scenario. Reload the page and they are gone.</p>
+       <strong>member report</strong> fills in your credit supply in section 02. Both are read by
+       your browser and never sent anywhere: no upload, no server, no network request. The report
+       itself is never written to browser storage and never appears in an exported scenario, so
+       closing the tab discards it. If you use <strong>Prefill from item report</strong>, the rows it
+       creates do persist with your scenario, but they carry only item type names and sizes, never
+       item titles or owner names.</p>
   </div>
 
   <div class="drop noprint" id="orgDrop" tabindex="0" role="button"
@@ -612,14 +652,19 @@ footer strong{color:var(--dim)}
   </table>
   </div>
   <div class="btnrow noprint">
-    <button class="primary" onclick="addRow()">Add new row</button>
-    <button class="primary" onclick="openScope()" aria-haspopup="dialog">Scope data</button>
-    <button class="primary" onclick="prefillFromOrg()">Prefill from item report</button>
+    <span class="tip btnwrap" tabindex="0" data-tip="Adds one empty row you fill in by hand. Use it when you know roughly what a layer looks like but have nothing to measure yet.">
+      <button class="primary" onclick="addRow()">Add new row</button></span>
+    <span class="tip btnwrap" tabindex="0" data-tip="Opens a panel with an ArcGIS Pro script that measures real feature counts, vertex counts and field counts from a local feature class or a hosted feature service, then loads the result straight into this table.">
+      <button class="primary" onclick="openScope()" aria-haspopup="dialog">Scope data</button></span>
+    <span class="tip btnwrap" tabindex="0" data-tip="Builds the whole table from an ArcGIS Online item report: one row per storage type, each carrying its real measured size. Replaces whatever is in the table now.">
+      <button class="primary" onclick="prefillFromOrg()">Prefill from item report</button></span>
     <span class="sep"></span>
-    <button class="ghost" id="presetToggle" aria-expanded="false" aria-controls="presetBtns"
-            onclick="togglePresets()">Presets <span class="caret">&#9662;</span></button>
+    <span class="tip btnwrap" tabindex="0" data-tip="Common layer types with typical feature, vertex and field counts. Starting points drawn from production data, not measurements of yours, so correct them once added.">
+      <button class="ghost" id="presetToggle" aria-expanded="false" aria-controls="presetBtns"
+              onclick="togglePresets()">Presets <span class="caret">&#9662;</span></button></span>
     <span class="sep"></span>
-    <button class="ghost" onclick="clearRows()">Clear all</button>
+    <span class="tip btnwrap r" tabindex="0" data-tip="Empties the table completely. Your credit supply, transactions and planning horizon are left alone.">
+      <button class="ghost" onclick="clearRows()">Clear all</button></span>
     <span class="msg" id="rowMsg"></span>
   </div>
   <div id="presetBtns" class="noprint" hidden></div>
@@ -761,7 +806,15 @@ footer strong{color:var(--dim)}
       <div id="advVerdict"></div>
     </div>
   </div>
-  <div class="band" style="margin-top:16px;border-left-color:var(--accent)">
+<div class="band" style="margin-top:16px">
+    <strong>Four practical levers, in the order they usually pay off.</strong>
+    Generalize the handful of dense shapes carrying your storage before you touch anything else.
+    Trim fields you do not publish, since every field is paid for in every row, every month.
+    Turn on Enable Sync and change tracking only where offline or editing is a real requirement,
+    because both grow the stored size over time. And delete or archive superseded content, since
+    storage is charged hourly and stops the moment the item is gone.
+  </div>
+  <div class="band" style="margin-top:12px;border-left-color:var(--accent)">
     <strong>What this does not decide for you.</strong>
     It is a cost comparison, and cost is not the only reason to move. Premium buys dedicated database
     compute, which is the right call when heavy query, edit or ETL loads are the problem even if
@@ -780,12 +833,16 @@ footer strong{color:var(--dim)}
   <div class="sub two">
     <p><strong>Do this:</strong> export the scenario if you will revisit it, copy the text summary if
        it is going into an email or a proposal, and print if someone needs it on paper.</p>
-    <p>Your scenario is kept in this browser automatically. Export it to a JSON file to version it
-       with a project, send it to someone else, or come back to a comparison you ran months ago.
-       Importing replaces everything currently on the page.</p>
-    <p>The text summary is plain text with the rates and assumptions attached, sized to drop straight
-       into an email or a proposal appendix without reformatting. Print produces a clean page with
-       the charts and tables and the controls stripped out.</p>
+    <p>Your scenario saves itself as you type, into this browser on this device only. Nobody else
+       sees it, it does not follow you to another machine, and a private window starts empty. It
+       survives closing the tab. <strong>Refreshing will not clear it</strong>, not even a hard
+       refresh, because it lives in browser storage rather than in the page. Use
+       <strong>Reset to defaults</strong> to get back to a clean starting scenario.</p>
+    <p>Export writes a JSON file you can version with a project, email to someone else, or reopen
+       months later; importing it replaces everything on the page. The text summary is plain text
+       with the rates and assumptions attached, sized to drop into an email or a proposal appendix
+       without reformatting. Print produces a clean page with the charts and tables and the controls
+       stripped out.</p>
   </div>
   <div class="btnrow" style="margin-top:0">
     <button onclick="copySummary()">Copy text summary</button>
@@ -794,80 +851,13 @@ footer strong{color:var(--dim)}
     <input type="file" id="imp" accept=".json,application/json" style="display:none" onchange="importJSON(this)">
     <button class="ghost" onclick="window.print()">Print or save as PDF</button>
     <span class="sep"></span>
-    <button class="ghost" onclick="resetAll()">Reset to defaults</button>
+    <span class="tip btnwrap r" tabindex="0" data-tip="Clears the saved scenario in this browser and restores the starting defaults. This is the way back to a clean slate; refreshing the page will not do it.">
+      <button class="ghost" onclick="resetAll()">Reset to defaults</button></span>
     <span class="msg" id="msg"></span>
   </div>
 </section>
 
-<!-- 8 -->
-<section id="sec-reference">
-  <h2><span class="num">08</span> Published rates <span class="role-tag role-ref">reference</span></h2>
-  <div class="h2rule"></div>
-  <div class="sub one">
-    <p>Esri's published credit consumption, used unchanged by this tool. It comes from Understand
-       credits unless a row links somewhere else, so any number here can be checked at the source
-       before it goes into a proposal.</p>
-  </div>
-  <div>
-    <div class="panel">
-      <h3>Esri credit rates</h3>
-      <p class="ph">All from <a href="https://doc.arcgis.com/en/arcgis-online/administer/credits.htm" target="_blank" rel="noopener">Understand credits</a> and used unchanged, except the four rows that link to a different page. Rates change; check the source before a number goes into a budget.</p>
-      <table class="ref"><tbody>
-        <tr><td>Feature storage, hosted feature layers</td><td>2.4 credits / 10 MB / month</td></tr>
-        <tr><td>File storage: attachments, documents, packages, vector tile layers, offline areas</td><td>1.2 credits / 1 GB / month</td></tr>
-        <tr><td>Tiled imagery storage</td><td>1.2 credits / 1 GB / month</td></tr>
-        <tr><td><a href="https://doc.arcgis.com/en/arcgis-online/create-maps/specify-the-runtime-of-a-notebook.htm" target="_blank" rel="noopener">Notebook workspace storage</a></td><td>12 credits / 1 GB / month / user</td></tr>
-        <tr><td>Geocoding, stored results</td><td>40 credits / 1,000</td></tr>
-        <tr><td>Printing from a custom layout template</td><td>5 credits / job</td></tr>
-        <tr><td>Simple routes</td><td>0.005 credits each</td></tr>
-        <tr><td>Optimized routes</td><td>0.5 credits each</td></tr>
-        <tr><td>Tile generation</td><td>1 credit / 10,000 tiles</td></tr>
-        <tr><td>Demographic maps and layers</td><td>10 credits / 1,000 map requests</td></tr>
-        <tr><td><a href="https://doc.arcgis.com/en/arcgis-online/create-maps/specify-the-runtime-of-a-notebook.htm" target="_blank" rel="noopener">Notebooks, Advanced runtime</a></td><td>3 credits / hour</td></tr>
-        <tr><td><a href="https://doc.arcgis.com/en/arcgis-online/create-maps/specify-the-runtime-of-a-notebook.htm" target="_blank" rel="noopener">Notebooks, Advanced with GPU</a></td><td>30 credits / hour</td></tr>
-        <tr><td><a href="https://doc.arcgis.com/en/arcgis-online/analyze/credits-analysis-mv.htm" target="_blank" rel="noopener">ModelBuilder analysis session</a></td><td>50 credits / hour</td></tr>
-        <tr><td>3D object layer from textured multipatch</td><td>1 credit / 1,000 features</td></tr>
-      </tbody></table>
-    </div>
-  </div>
-  <div class="panel" style="margin-top:16px">
-    <h3>How accurate is this</h3>
-    <p class="ph">Three things go into every number here, and they are not equally trustworthy. It is worth knowing which is which before you quote one.</p>
-    <table class="ref prose"><tbody>
-      <tr><td><strong>Published rates</strong><br><span style="color:var(--dim-2)">Esri's figures, used unchanged</span></td>
-          <td>Exact, until Esri changes them. Every rate links to its source above.</td></tr>
-      <tr><td><strong>Measured storage</strong><br><span style="color:var(--dim-2)">From an item report, or the Scope data script</span></td>
-          <td>Real megabytes. The only estimate left is how the content grows from here.</td></tr>
-      <tr><td><strong>Modeled storage</strong><br><span style="color:var(--dim-2)">From vertex and field counts, when nothing was measured</span></td>
-          <td>An engineering approximation, not an Esri figure. Treat it as a band.</td></tr>
-    </tbody></table>
-    <p style="font-size:12.5px;color:var(--dim);margin:15px 0 0">
-      The rate arithmetic has been checked against three production organizations by predicting
-      credit consumption from an item report and comparing it to the credit report for the same
-      period. Across 45 individual layers in two of them, predictions landed within about 5% of
-      actual consumption. Every item that missed by more than that was either created after the
-      billing period closed or is a layer the organization actively edits, so the gap is the content
-      changing between the snapshot and the bill, not the arithmetic. The third organization is on a
-      Premium feature data store, where feature storage leaves the credit model entirely; with
-      Premium selected in section 02 it lands within 8%.
-    </p>
-    <p style="font-size:12.5px;color:var(--dim);margin:12px 0 0">
-      So the honest expectation: if your content is stable, this should land within a few percent of
-      your bill. If it is growing, it will read high by roughly however much it grew. And if your
-      feature storage prediction is off by two orders of magnitude rather than a few percent, you are
-      on a Premium data store and have not told the tool yet.
-    </p>
-  </div>
 
-  <div class="band" style="margin-top:16px">
-    <strong>Four practical levers, in the order they usually pay off.</strong>
-    Generalize the handful of dense shapes carrying your storage before you touch anything else.
-    Trim fields you do not publish, since every field is paid for in every row, every month.
-    Turn on Enable Sync and change tracking only where offline or editing is a real requirement,
-    because both grow the stored size over time. And delete or archive superseded content, since
-    storage is charged hourly and stops the moment the item is gone.
-  </div>
-</section>
 
 <footer>
   <div class="cols">
@@ -896,9 +886,118 @@ footer strong{color:var(--dim)}
       <p style="margin-top:14px">Runs entirely in your browser. No data leaves this page.</p>
     </div>
   </div>
+  <div class="fcontact">
+    <img src="assets/author.jpg" alt="" width="42" height="42">
+    <div>
+      <p><strong>Brian Kingery, GISP, PMP</strong> &middot; GIS Solutions Architect, Timmons Group</p>
+      <p>Questions, corrections, or a rate that has changed since this was published?
+        <a href="https://www.linkedin.com/in/briankingery87/" target="_blank" rel="noopener">Reach me on LinkedIn</a>
+        or open an issue on
+        <a href="https://github.com/briankingery87/agol-credit-planner" target="_blank" rel="noopener">GitHub</a>.
+        The source is MIT licensed, so fork it and make it yours.</p>
+    </div>
+  </div>
 </footer>
 
 </div>
+
+<div class="scrim noprint" id="ratesScrim" onclick="closeRates()"></div>
+<aside class="drawer noprint" id="ratesDrawer" role="dialog" aria-modal="true"
+       aria-labelledby="ratesTitle" aria-hidden="true">
+  <div class="drawer-hd">
+    <div>
+      <h3 id="ratesTitle">Rates and prices</h3>
+      <p>Every published figure this tool calculates with, and where each one comes from.</p>
+    </div>
+    <button class="drawer-x" onclick="closeRates()" aria-label="Close">&times;</button>
+  </div>
+  <div class="drawer-body">
+    <h4 class="dsec">Credit consumption</h4>
+    <p class="dnote">Esri's published rates, used unchanged. Four rows link to a page other than
+      <a href="https://doc.arcgis.com/en/arcgis-online/administer/credits.htm" target="_blank" rel="noopener">Understand credits</a>.
+      Rates change; check the source before a number goes into a budget.</p>
+<table class="ref"><tbody>
+        <tr><td>Feature storage, hosted feature layers</td><td>2.4 credits / 10 MB / month</td></tr>
+        <tr><td>File storage: attachments, documents, packages, vector tile layers, offline areas</td><td>1.2 credits / 1 GB / month</td></tr>
+        <tr><td>Tiled imagery storage</td><td>1.2 credits / 1 GB / month</td></tr>
+        <tr><td><a href="https://doc.arcgis.com/en/arcgis-online/create-maps/specify-the-runtime-of-a-notebook.htm" target="_blank" rel="noopener">Notebook workspace storage</a></td><td>12 credits / 1 GB / month / user</td></tr>
+        <tr><td>Geocoding, stored results</td><td>40 credits / 1,000</td></tr>
+        <tr><td>Printing from a custom layout template</td><td>5 credits / job</td></tr>
+        <tr><td>Simple routes</td><td>0.005 credits each</td></tr>
+        <tr><td>Optimized routes</td><td>0.5 credits each</td></tr>
+        <tr><td>Tile generation</td><td>1 credit / 10,000 tiles</td></tr>
+        <tr><td>Demographic maps and layers</td><td>10 credits / 1,000 map requests</td></tr>
+        <tr><td><a href="https://doc.arcgis.com/en/arcgis-online/create-maps/specify-the-runtime-of-a-notebook.htm" target="_blank" rel="noopener">Notebooks, Advanced runtime</a></td><td>3 credits / hour</td></tr>
+        <tr><td><a href="https://doc.arcgis.com/en/arcgis-online/create-maps/specify-the-runtime-of-a-notebook.htm" target="_blank" rel="noopener">Notebooks, Advanced with GPU</a></td><td>30 credits / hour</td></tr>
+        <tr><td><a href="https://doc.arcgis.com/en/arcgis-online/analyze/credits-analysis-mv.htm" target="_blank" rel="noopener">ModelBuilder analysis session</a></td><td>50 credits / hour</td></tr>
+        <tr><td>3D object layer from textured multipatch</td><td>1 credit / 1,000 features</td></tr>
+      </tbody></table>
+    <h4 class="dsec">Credit price</h4>
+    <table class="ref"><tbody>
+      <tr><td>Purchased credits</td><td><strong>$0.12</strong> per credit</td></tr>
+      <tr><td>Minimum purchase</td><td>1 block of <strong>1,000</strong> credits</td></tr>
+      <tr><td>Expiry</td><td>2 years from purchase</td></tr>
+    </tbody></table>
+    <p class="dnote">Every dollar figure in the tool uses the list price above. Your agreement may
+      differ; treat the credit counts as the firm number and the dollars as indicative.</p>
+
+    <h4 class="dsec">Premium feature data store</h4>
+    <table class="ref"><tbody>
+      <tr><td><strong>Standard</strong><br><span style="color:var(--dim-2)">shared, credit-billed</span></td>
+          <td>Up to <strong>500 GB</strong><br><span style="color:var(--dim-2)">2.4 credits / 10 MB / month</span></td></tr>
+      <tr><td><strong>M2</strong><br><span style="color:var(--dim-2)">entry level</span></td>
+          <td><strong>$2,800</strong> / month<br><span style="color:var(--dim-2)">2 TB</span></td></tr>
+      <tr><td><strong>M3</strong><br><span style="color:var(--dim-2)">2x M2 compute</span></td>
+          <td><strong>$4,950</strong> / month<br><span style="color:var(--dim-2)">3 TB</span></td></tr>
+      <tr><td><strong>M4</strong><br><span style="color:var(--dim-2)">2x M3, 16x Standard</span></td>
+          <td><strong>$9,500</strong> / month<br><span style="color:var(--dim-2)">4 TB</span></td></tr>
+    </tbody></table>
+    <p class="dnote">List prices read from the
+      <a href="https://www.esri.com/en-us/arcgis/products/premium-feature-data-store/buy" target="_blank" rel="noopener">Premium Feature Data Store</a>
+      product page, September 2026. Premium removes feature storage from the credit model; file
+      storage, imagery and every transaction still consume credits either way.</p>
+  </div>
+</aside>
+
+<div class="scrim noprint" id="accScrim" onclick="closeAcc()"></div>
+<aside class="drawer noprint" id="accDrawer" role="dialog" aria-modal="true"
+       aria-labelledby="accTitle" aria-hidden="true">
+  <div class="drawer-hd">
+    <div>
+      <h3 id="accTitle">How accurate is this</h3>
+      <p>What has been checked against real organizations, and what is still an estimate.</p>
+    </div>
+    <button class="drawer-x" onclick="closeAcc()" aria-label="Close">&times;</button>
+  </div>
+  <div class="drawer-body">
+
+    <p class="ph">Three things go into every number here, and they are not equally trustworthy. It is worth knowing which is which before you quote one.</p>
+    <table class="ref prose"><tbody>
+      <tr><td><strong>Published rates</strong><br><span style="color:var(--dim-2)">Esri's figures, used unchanged</span></td>
+          <td>Exact, until Esri changes them. Every rate links to its source above.</td></tr>
+      <tr><td><strong>Measured storage</strong><br><span style="color:var(--dim-2)">From an item report, or the Scope data script</span></td>
+          <td>Real megabytes. The only estimate left is how the content grows from here.</td></tr>
+      <tr><td><strong>Modeled storage</strong><br><span style="color:var(--dim-2)">From vertex and field counts, when nothing was measured</span></td>
+          <td>An engineering approximation, not an Esri figure. Treat it as a band.</td></tr>
+    </tbody></table>
+    <p style="font-size:12.5px;color:var(--dim);margin:15px 0 0">
+      The rate arithmetic has been checked against three production organizations by predicting
+      credit consumption from an item report and comparing it to the credit report for the same
+      period. Across 45 individual layers in two of them, predictions landed within about 5% of
+      actual consumption. Every item that missed by more than that was either created after the
+      billing period closed or is a layer the organization actively edits, so the gap is the content
+      changing between the snapshot and the bill, not the arithmetic. The third organization is on a
+      Premium feature data store, where feature storage leaves the credit model entirely; with
+      Premium selected in section 02 it lands within 8%.
+    </p>
+    <p style="font-size:12.5px;color:var(--dim);margin:12px 0 0">
+      So the honest expectation: if your content is stable, this should land within a few percent of
+      your bill. If it is growing, it will read high by roughly however much it grew. And if your
+      feature storage prediction is off by two orders of magnitude rather than a few percent, you are
+      on a Premium data store and have not told the tool yet.
+    </p>
+  </div>
+</aside>
 
 <div class="scrim noprint" id="glossScrim" onclick="closeGloss()"></div>
 <aside class="drawer noprint" id="glossDrawer" role="dialog" aria-modal="true"
@@ -921,6 +1020,7 @@ footer strong{color:var(--dim)}
         <div class="gl-t"><dt>Subscription year</dt><dd>Your renewal term, and the real planning unit. Included credits do not roll over: whatever you have not spent when the term ends is gone. That is why the cumulative chart in section 05 resets at each anniversary instead of running straight up.</dd></div>
         <div class="gl-t"><dt>Credit block</dt><dd>How purchased credits are sold: blocks of 1,000, with no partial block. Purchased credits expire two years after purchase, so buying several years of headroom at once can cost more than it saves.</dd></div>
         <div class="gl-t"><dt>Calculated hourly</dt><dd>Esri meters storage by the hour rather than by the month, so a layer deleted on the 10th stops costing you on the 10th. It also means an item created mid-month bills only for the part of the month it existed.</dd></div>
+        <div class="gl-t"><dt>Where your data goes</dt><dd>Nowhere. This page is a single HTML file with no back end and no analytics, and it makes no network requests at all after it loads. A report you drop in is read by your browser with the local file reader, summarized into totals, and held in memory until you close the tab; it is never written to browser storage and never appears in an exported scenario. Your scenario itself does save, to this browser on this device only, so you can come back to it. Reset to defaults clears it.</dd></div>
         <div class="gl-t"><dt>Modeled size</dt><dd>The size column in section 03 when a row has no measurement behind it. Esri publishes credits per megabyte but not megabytes per feature, so the tool estimates from vertex count, field count and overhead. Rows built from an item report are marked measured and skip the model entirely.</dd></div>
     </dl>
   </div>
@@ -932,8 +1032,9 @@ footer strong{color:var(--dim)}
   <div class="drawer-hd">
     <div>
       <h3 id="scopeTitle">Scope your data</h3>
-      <p>Measure real geometry in ArcGIS Pro, then load it straight into the table. Each line you
-         paste back becomes a row with your own feature count, mean vertex count and field count.</p>
+      <p>Measure real geometry in ArcGIS Pro, from a local feature class or a hosted feature
+         service, then load it straight into the table. Edit the two settings at the top of the
+         script, run it, and paste everything it prints into step 2.</p>
     </div>
     <button class="drawer-x" onclick="closeScope()" aria-label="Close">&times;</button>
   </div>
@@ -943,38 +1044,60 @@ footer strong{color:var(--dim)}
           <span class="lbl">Step 1 &middot; run in the ArcGIS Pro Python window</span>
           <button class="ghost noprint" onclick="copyCode(this)">Copy script</button>
         </div>
-<pre><span class="c"># Measure feature classes for the AGOL Credit Planner.</span>
-<span class="c"># Copy the PLANNER lines from the output and paste them</span>
-<span class="c"># into the planner, section 03.</span>
+<pre><span class="c"># ============ EDIT THESE TWO SETTINGS ============</span>
+<span class="c"># Local feature classes, hosted feature service URLs, or both.</span>
+SOURCES = [
+    r<span class="s">"C:\data\Base.gdb\Parcels"</span>,
+    <span class="s">"https://services.arcgis.com/XXXX/arcgis/rest/services/Roads/FeatureServer/0"</span>,
+]
+<span class="c"># Only needed for secured services. Leave blank for public ones.</span>
+PORTAL = (<span class="s">""</span>, <span class="s">""</span>)   <span class="c"># ("https://myorg.maps.arcgis.com", "username")</span>
+<span class="c"># =================================================</span>
+
 <span class="k">import</span> arcpy, statistics
 
-FCS = [
-    r<span class="s">"C:\data\Base.gdb\Parcels"</span>,
-    <span class="c"># add more feature classes here</span>
-]
+<span class="k">if</span> PORTAL[0] <span class="k">and</span> <span class="k">any</span>(<span class="k">str</span>(x).lower().startswith(<span class="s">"http"</span>) <span class="k">for</span> x <span class="k">in</span> SOURCES):
+    arcpy.SignInToPortal(PORTAL[0], PORTAL[1])
 
-<span class="k">for</span> fc <span class="k">in</span> FCS:
-    name = arcpy.Describe(fc).baseName
-    v = [r[0].pointCount <span class="k">for</span> r
-         <span class="k">in</span> arcpy.da.SearchCursor(fc, [<span class="s">"SHAPE@"</span>])
-         <span class="k">if</span> r[0]]
-    f = [x <span class="k">for</span> x <span class="k">in</span> arcpy.ListFields(fc)
-         <span class="k">if</span> x.type <span class="k">not in</span> (<span class="s">"OID"</span>, <span class="s">"Geometry"</span>)
-         <span class="k">and</span> x.name.lower() <span class="k">not in</span>
-         (<span class="s">"shape_length"</span>, <span class="s">"shape_area"</span>)]
+<span class="k">def</span> measure(src):
+    <span class="c"># A service URL has to become a layer before a cursor can read it.</span>
+    <span class="k">if</span> <span class="k">str</span>(src).lower().startswith(<span class="s">"http"</span>):
+        lyr = arcpy.management.MakeFeatureLayer(src, <span class="s">"_scope_tmp"</span>)[0]
+        name = arcpy.Describe(lyr).name
+    <span class="k">else</span>:
+        lyr = src
+        name = arcpy.Describe(src).baseName
+    <span class="k">try</span>:
+        v = [r[0].pointCount <span class="k">for</span> r
+             <span class="k">in</span> arcpy.da.SearchCursor(lyr, [<span class="s">"SHAPE@"</span>]) <span class="k">if</span> r[0]]
+        f = [x <span class="k">for</span> x <span class="k">in</span> arcpy.ListFields(lyr)
+             <span class="k">if</span> x.type <span class="k">not in</span> (<span class="s">"OID"</span>, <span class="s">"Geometry"</span>)
+             <span class="k">and</span> x.name.lower() <span class="k">not in</span> (<span class="s">"shape_length"</span>, <span class="s">"shape_area"</span>)]
+    <span class="k">finally</span>:
+        <span class="k">if</span> arcpy.Exists(<span class="s">"_scope_tmp"</span>):
+            arcpy.management.Delete(<span class="s">"_scope_tmp"</span>)
     <span class="k">if not</span> v:
-        <span class="k">print</span>(name, <span class="s">"has no geometry, skipped"</span>)
-        <span class="k">continue</span>
-    <span class="k">print</span>(<span class="s">"{}  features {:,}  mean {:.1f}  "</span>
-          <span class="s">"median {:.0f}  max {:,}  fields {}"</span>.format(
-          name, <span class="k">len</span>(v), statistics.mean(v),
-          statistics.median(v), <span class="k">max</span>(v), <span class="k">len</span>(f)))
-    <span class="k">print</span>(<span class="s">"PLANNER|{}|{}|{:.1f}|{}"</span>.format(
-          name, <span class="k">len</span>(v), statistics.mean(v), <span class="k">len</span>(f)))</pre>
+        <span class="k">return None</span>
+    name = <span class="k">str</span>(name).replace(<span class="s">"|"</span>, <span class="s">"-"</span>)   <span class="c"># pipe is the field separator</span>
+    <span class="k">return</span> <span class="s">"PLANNER|{}|{}|{:.1f}|{}"</span>.format(
+        name, <span class="k">len</span>(v), statistics.mean(v), <span class="k">len</span>(f))
+
+lines = []
+<span class="k">for</span> src <span class="k">in</span> SOURCES:
+    <span class="k">try</span>:
+        out = measure(src)
+        <span class="k">if</span> out:
+            lines.append(out)
+    <span class="k">except</span> Exception <span class="k">as</span> e:
+        arcpy.AddWarning(<span class="s">"skipped {}: {}"</span>.format(src, e))
+
+<span class="c"># Nothing else is printed. Copy all of it into step 2.</span>
+<span class="k">print</span>(<span class="s">"\n"</span>.join(lines))</pre>
         <p style="font-size:12px;color:var(--dim-2);margin:11px 0 0">
-          The readable line is for you: a layer whose mean sits far above its median has a handful of
-          very dense shapes carrying the storage, and generalizing just those is usually the cheapest
-          optimization available. The PLANNER line is for the box below.
+          Only PLANNER lines are printed, so the whole output can be copied straight across. A source
+          that fails, has no geometry, or that you cannot reach is skipped with a warning instead of
+          stopping the run. Measuring a hosted service reads every feature over the wire, so try one
+          layer before pointing it at a long list.
         </p>
     </div>
     <div class="codewrap" style="margin-top:22px">
@@ -1030,8 +1153,12 @@ const USER_TYPES = [
    differently; section 03 discloses them on the page. */
 const DEFAULTS = {
   users:{creator:3,professional:1,proplus:0,mobile:0,contributor:0,editor:5},
+  /* Esri list price per credit. Not user-editable in the page: it is a published
+     figure, and letting it drift silently makes every dollar number unverifiable. */
   supply:{purchased:0, useBalance:false, balance:0, months:24, price:0.12},
-  fds:{premium:false, tier:"m2", m2:2800, m3:4950, m4:9500},
+  /* Premium level prices live in TIERS, not here: they are Esri list prices, not
+     something to type over. */
+  fds:{premium:false, tier:"m2"},
   model:{bytesPerVertex:16,bytesPerAttr:24,rowOverhead:48,indexFactor:1.60,syncFactor:1.70,calibration:1.00},
   txm:{geocodes:0,prints:0,optRoutes:0,simpleRoutes:0,tiles:0,notebookHrs:0,demoReq:0},
   txo:{geocodes:0,tiles:0,notebookHrs:0},
@@ -1103,6 +1230,7 @@ function field(group,key,label,opts){
   return [k,i];
 }
 function head(t){ const h = document.createElement("div"); h.className = "head"; h.textContent = t; return h; }
+function setHorizon(m){ S.supply.months = m; buildControls(); calc(); save(); }
 
 /* Standard is the default and is stated as an option rather than implied by an
    unchecked box. The level select only exists while Premium is chosen. */
@@ -1154,9 +1282,23 @@ function buildControls(){
   f = field("supply","purchased","Additional purchased credits",{min:0,step:1}); s.append(f[0],f[1]);
   f = field("supply","useBalance","Use a known balance instead",{type:"check"}); s.append(f[0],f[1]);
   f = field("supply","balance","Current credit balance",{min:0,step:1}); f[1].id = "balInput"; s.append(f[0],f[1]);
-  s.append(head("Planning"));
-  f = field("supply","months","Planning horizon, months",{min:1,step:1}); s.append(f[0],f[1]);
-  f = field("supply","price","Price per credit, USD",{min:0,step:0.01}); s.append(f[0],f[1]);
+  s.append(head("Planning horizon"));
+  const hz = document.createElement("div"); hz.className = "span horizon";
+  hz.innerHTML =
+    '<div class="hz-row">'
+    + '<input type="number" id="hzInput" min="1" max="120" step="1" value="'+Math.round(S.supply.months)+'" data-g="supply" data-k="months" aria-label="Planning horizon in months">'
+    + '<span class="hz-u">months</span>'
+    + '<span class="hz-btns">'
+    +   [12,24,36,60].map(m=>'<button type="button" class="hz-b'+(Math.round(S.supply.months)===m?' on':'')+'" onclick="setHorizon('+m+')">'+m+'</button>').join("")
+    + '</span></div>'
+    + '<p class="hz-n">Everything in sections 05 and 06 is calculated over this window. Credits reset'
+    + ' at each subscription anniversary, so a horizon longer than 12 months shows you the resets.</p>';
+  s.append(hz);
+  const pr = document.createElement("div"); pr.className = "span fixed-rate";
+  pr.innerHTML = '<span class="fr-l">Credit price</span>'
+    + '<span class="fr-v">' + money(S.supply.price,2) + '</span>'
+    + '<span class="fr-n">Esri list price per credit. Dollar figures throughout the tool use it.</span>';
+  s.append(pr);
 
   // fds
   buildFds();
@@ -1292,7 +1434,12 @@ function handle(e){
     else if(t.dataset.bool !== undefined)      S[g][k] = t.value === "1";  // radio pair
     else if(t.type === "checkbox")             S[g][k] = t.checked;
     else                                       S[g][k] = num(t.value);
-    if(g === "fds"){ buildFds(); if(ORG) renderOrg(); }
+    if(g === "fds"){
+      buildFds();
+      const tb = document.querySelector("#pfdsTiers tbody");
+      if(tb){ tb.dataset.built = ""; }      // the selected-level highlight has to redraw
+      if(ORG) renderOrg();
+    }
     touched = true;
   }
   if(touched){
@@ -1352,11 +1499,11 @@ function calc(){
     const tr = trs[i]; if(!tr) return;
     tr.querySelector('[data-o="size"]').textContent = fmtSize(mb);
     tr.querySelector('[data-o="cred"]').textContent = (r.type === "feature" && prem) ? "covered" : fmt(c,1);
-    tr.querySelector('[data-o="cost"]').textContent = (r.type === "feature" && prem) ? "-" : "$"+fmt(c*price,2);
+    tr.querySelector('[data-o="cost"]').textContent = (r.type === "feature" && prem) ? "-" : money(c*price,2);
   });
   document.getElementById("tSize").textContent = fmtSize(mb1);
   document.getElementById("tCred").textContent = fmt(cred1,1);
-  document.getElementById("tCost").textContent = "$"+fmt(cred1*price,2);
+  document.getElementById("tCost").textContent = money(cred1*price,2);
 
   const txm = txMonthly(), txo = txOnce();
   const series = [];
@@ -1393,14 +1540,14 @@ function calc(){
 
   setKPI("k1", fmtSize(mb1), "Modeled storage at month 1",
     rows.filter(r=>r.type==="feature").length+" feature layers, "+rows.filter(r=>r.type!=="feature").length+" file or imagery items");
-  setKPI("k2", fmt(steady,0), "Credits per month at month 1", "$"+fmt(steady*price,2)+" per month");
+  setKPI("k2", fmt(steady,0), "Credits per month at month 1", money(steady*price,2)+" per month");
   setKPI("k3", fmt(yr1,0), "Credits in subscription year 1",
-    "$"+fmt(yr1*price,0)+" if purchased at $"+price.toFixed(2)+" per credit");
+    money(yr1*price)+" if purchased at "+money(price,2)+" per credit");
 
   const head = avail - yr1;
   setKPI("k4", fmt(avail,0), "Available credits per year",
     head >= 0 ? fmt(head,0)+" credits of headroom in year 1"
-              : fmt(-head,0)+" credit shortfall, about $"+fmt(-head*price,0),
+              : fmt(-head,0)+" credit shortfall, about "+money(-head*price),
     head >= 0 ? (head/Math.max(avail,1) > 0.35 ? "good" : "warn") : "bad");
 
   const inc = document.getElementById("incOut");
@@ -1424,7 +1571,7 @@ function calc(){
     + brow("Imagery storage", totIm, grand, price, "")
     + brow("Transactions and analysis", totT, grand, price, "")
     + '<tr><td style="font-weight:650;border-top:1px solid var(--accent)">Total over '+months+' months</td>'
-    + '<td style="font-weight:650;border-top:1px solid var(--accent)">'+fmt((prem?0:totF)+totI+totT,0)+' credits &nbsp; $'+fmt(((prem?0:totF)+totI+totT)*price,0)+'</td></tr>';
+    + '<td style="font-weight:650;border-top:1px solid var(--accent)">'+fmt((prem?0:totF)+totI+totT,0)+' credits &nbsp; '+money(((prem?0:totF)+totI+totT)*price)+'</td></tr>';
 
   const pf = document.getElementById("pfds");
   const stdCost = totF*price;
@@ -1432,7 +1579,7 @@ function calc(){
     brow2("Feature storage on Standard, over "+months+" months", totF, price)
   + brow2("Everything that bills the same either way", totI+totT, price)
   + '<tr><td style="font-weight:650;border-top:1px solid var(--accent)">Credit spend Premium would remove</td>'
-  + '<td style="font-weight:650;border-top:1px solid var(--accent)">'+fmt(totF,0)+' credits &nbsp; $'+fmt(stdCost,0)+'</td></tr>';
+  + '<td style="font-weight:650;border-top:1px solid var(--accent)">'+fmt(totF,0)+' credits &nbsp; '+money(stdCost)+'</td></tr>';
 
   renderTiers(stdCost, months, price, featMB1);
   renderAdvice(yearStd, yearNoFeat, months, price, avail, featMB1);
@@ -1444,11 +1591,11 @@ function calc(){
 function brow(label, c, grand, price, note){
   const pct = grand > 0 ? (c/grand*100) : 0;
   return '<tr><td>'+label+(note?' <span style="color:var(--dim-2)">'+note+'</span>':'')+'</td>'+
-         '<td>'+fmt(c,0)+' credits &nbsp; <span style="color:var(--dim-2)">'+pct.toFixed(0)+'%</span> &nbsp; $'+fmt(c*price,0)+'</td></tr>';
+         '<td>'+fmt(c,0)+' credits &nbsp; <span style="color:var(--dim-2)">'+pct.toFixed(0)+'%</span> &nbsp; '+money(c*price)+'</td></tr>';
 }
 function brow2(label, c, price, note){
   return '<tr><td>'+label+(note?' <span style="color:var(--dim-2)">'+note+'</span>':'')+'</td>'+
-         '<td>'+fmt(c,0)+' credits &nbsp; $'+fmt(c*price,0)+'</td></tr>';
+         '<td>'+fmt(c,0)+' credits &nbsp; '+money(c*price)+'</td></tr>';
 }
 /* Premium feature data store levels. Monthly list prices and capacities read from
    esri.com/en-us/arcgis/products/premium-feature-data-store/buy, September 2026.
@@ -1460,11 +1607,14 @@ const TIERS = [["m2","M2","entry level",2800,2],
 function buildTiers(){
   const tb = document.querySelector("#pfdsTiers tbody");
   if(!tb || tb.dataset.built) return;
-  let html = '<tr><th>Level</th><th class="num">USD / month</th><th class="num" id="tHdrCost">Over the horizon</th>'
+  let html = '<tr><th>Level</th><th class="num">List price</th><th class="num" id="tHdrCost">Over the horizon</th>'
            + '<th class="num">Break-even feature storage</th></tr>';
   TIERS.forEach(([k,label,note,listPrice,capTB])=>{
-    html += '<tr><td><strong>'+label+'</strong> <span style="color:var(--dim-2)">'+note+', '+capTB+' TB</span></td>'
-          + '<td class="num"><input type="number" min="0" step="50" value="'+(S.fds[k]||0)+'" data-g="fds" data-k="'+k+'" aria-label="'+label+' price per month"></td>'
+    const sel = S.fds.premium && S.fds.tier === k;
+    html += '<tr'+(sel?' class="sel"':'')+'><td><strong>'+label+'</strong>'
+          + (sel?' <span class="tag">selected</span>':'')
+          + '<br><span style="color:var(--dim-2)">'+note+', '+capTB+' TB</span></td>'
+          + '<td class="num"><strong>'+money(listPrice)+'</strong><br><span style="color:var(--dim-2)">per month</span></td>'
           + '<td class="num" id="tCost-'+k+'">-</td>'
           + '<td class="num" id="tBE-'+k+'">-</td></tr>';
   });
@@ -1485,7 +1635,7 @@ function renderTiers(stdCost, months, price, featMB1){
   const stdCred = stdCost/Math.max(price,0.0001);
   let best = null, fits = null;
   TIERS.forEach(([k,label,note,listPrice,capTB])=>{
-    const mo = S.fds[k]||0;
+    const mo = listPrice;
     const cost = mo*months;
     const delta = stdCost - cost;                     // positive means Premium is the cheaper line
     const beCred = mo/Math.max(price,0.0001);         // feature credits per month of equal cost
@@ -1493,23 +1643,23 @@ function renderTiers(stdCost, months, price, featMB1){
     if(best === null || cost < best.cost) best = {label:label, cost:cost, delta:delta, beGB:beGB, capTB:capTB};
     if(fits === null && featGB <= capTB*1024) fits = {label:label, capTB:capTB};
     const c = document.getElementById("tCost-"+k), b = document.getElementById("tBE-"+k);
-    if(c) c.innerHTML = '$'+fmt(cost,0)+'<br><span style="color:'+(delta>=0?"var(--good)":"var(--bad)")+'">'
-                      + (delta>=0 ? "saves $"+fmt(delta,0) : "+$"+fmt(-delta,0))+'</span>';
+    if(c) c.innerHTML = money(cost)+'<br><span style="color:'+(delta>=0?"var(--good)":"var(--bad)")+'">'
+                      + (delta>=0 ? "saves "+money(delta) : money(-delta)+" more")+'</span>';
     if(b) b.innerHTML = fmt(beGB,0)+' GB<br><span style="color:var(--dim-2)">'+fmt(beCred,0)+' credits / mo</span>';
   });
 
   const where = "You are modeling " + fmtSize(featMB1) + " of feature data, "
-    + fmt(stdCred,0) + " credits and about $" + fmt(stdCost,0) + " over " + months + " months on Standard. ";
+    + fmt(stdCred,0) + " credits and about " + money(stdCost) + " over " + months + " months on Standard. ";
   let verdict;
   if(featGB > 500){
     verdict = "That is past the 500 GB ceiling on a Standard feature data store, so Premium is required rather than optional"
       + (fits ? ", and " + fits.label + " is the smallest level that holds it at " + fits.capTB + " TB." : ", and it exceeds even M4 at 4 TB.");
   } else if(best.delta >= 0){
-    verdict = best.label + " is the cheaper line item by $" + fmt(best.delta,0) + " over the horizon, on top of giving you "
+    verdict = best.label + " is the cheaper line item by " + money(best.delta) + " over the horizon, on top of giving you "
       + best.capTB + " TB and dedicated database compute.";
   } else {
     verdict = "Standard is cheaper at this volume. " + best.label + " pays for itself once feature storage passes about "
-      + fmt(best.beGB,0) + " GB at $" + price.toFixed(2) + " per credit, and its dedicated compute may justify it well before that.";
+      + fmt(best.beGB,0) + " GB at " + money(price,2) + " per credit, and its dedicated compute may justify it well before that.";
   }
   vd.innerHTML = where + verdict;
 }
@@ -1537,7 +1687,7 @@ function renderAdvice(yearStd, yearNoFeat, months, price, avail, featMB1){
     block:featGB > 500 ? "past the 500 GB Standard ceiling" : ""
   }];
   TIERS.forEach(([k,label,note,listPrice,capTB])=>{
-    const mo = S.fds[k]||0;
+    const mo = listPrice;
     opts.push({
       key:k, name:"Move to "+label, short:label, note:capTB+" TB, "+note,
       sub:mo*months, blocks:blocksOf(shortPrem), viable:featGB <= capTB*1024,
@@ -1559,9 +1709,9 @@ function renderAdvice(yearStd, yearNoFeat, months, price, avail, featMB1){
           + (isWin ? ' <span style="color:var(--good);font-weight:650">&#10003; cheapest</span>' : '')
           + '<br><span style="color:var(--dim-2)">'+(o.block || o.note)+'</span></td>'
           + '<td class="num">'+(o.viable ? (o.blocks ? o.blocks+' &times; 1,000' : 'none') : '-')+'</td>'
-          + '<td class="num">'+(o.viable ? '$'+fmt(o.cost,0) : '<span style="color:var(--dim-2)">not viable</span>')
-          + (o.viable && o.sub ? '<br><span style="color:var(--dim-2)">$'+fmt(o.sub,0)+' subscription'
-              + (o.credits ? ' + $'+fmt(o.credits,0)+' credits' : '')+'</span>'
+          + '<td class="num">'+(o.viable ? money(o.cost) : '<span style="color:var(--dim-2)">not viable</span>')
+          + (o.viable && o.sub ? '<br><span style="color:var(--dim-2)">'+money(o.sub)+' subscription'
+              + (o.credits ? ' + '+money(o.credits)+' credits' : '')+'</span>'
             : '')+'</td></tr>';
   });
   tb.innerHTML = html;
@@ -1590,16 +1740,16 @@ function renderAdvice(yearStd, yearNoFeat, months, price, avail, featMB1){
   let bullets = [];
   if(win.cost > 0){
     bullets.push(win.sub && win.credits
-      ? "<strong>$" + fmt(win.cost,0) + "</strong> over " + months + " months: $" + fmt(win.sub,0)
-        + " of subscription plus $" + fmt(win.credits,0) + " of credits."
+      ? "<strong>" + money(win.cost) + "</strong> over " + months + " months: " + money(win.sub)
+        + " of subscription plus " + money(win.credits) + " of credits."
       : win.sub
-      ? "<strong>$" + fmt(win.cost,0) + "</strong> of subscription over " + months + " months, with no credit purchase on top."
-      : "<strong>$" + fmt(win.cost,0) + "</strong> of credits over " + months + " months.");
+      ? "<strong>" + money(win.cost) + "</strong> of subscription over " + months + " months, with no credit purchase on top."
+      : "<strong>" + money(win.cost) + "</strong> of credits over " + months + " months.");
   }
   if(runnerUp){
     const gap = runnerUp.cost - win.cost;
-    bullets.push("Next cheapest is <strong>" + runnerUp.short + "</strong> at $"
-      + fmt(runnerUp.cost,0) + ", " + (gap > 0 ? "$" + fmt(gap,0) + " more" : "the same") + ".");
+    bullets.push("Next cheapest is <strong>" + runnerUp.short + "</strong> at "
+      + money(runnerUp.cost) + ", " + (gap > 0 ? money(gap) + " more" : "the same") + ".");
   }
   if(win.key === "std" && featGB > 100){
     bullets.push("Feature storage is " + fmtSize(featMB1) + ". Re-run this once it grows, because the Premium levels overtake credits as it climbs.");
@@ -1906,7 +2056,7 @@ function renderOrg(){
   setKPI("o2", fmtSize(o.fileMB), "File and imagery storage, measured",
     fmt(fileCred,0) + " credits per month");
   setKPI("o3", fmt(cred,0), "Storage credits per month",
-    "$" + fmt(cred*price,2) + " per month at $" + price.toFixed(2) + " per credit"
+    money(cred*price,2) + " per month at " + money(price,2) + " per credit"
     + (prem ? ", plus the Premium subscription" : ""));
   const wasteCred = prem ? o.wasteCredFile : o.wasteCred;
   setKPI("o4", fmtSize(o.wasteMB), "In the recycle bin or never opened",
@@ -1990,12 +2140,17 @@ function openScope(){ openDrawer("scopeDrawer","scopeScrim","measIn"); }
 function closeScope(){ closeDrawer("scopeDrawer","scopeScrim"); }
 function openGloss(){ openDrawer("glossDrawer","glossScrim"); }
 function closeGloss(){ closeDrawer("glossDrawer","glossScrim"); }
+function openRates(){ openDrawer("ratesDrawer","ratesScrim"); }
+function closeRates(){ closeDrawer("ratesDrawer","ratesScrim"); }
+function openAcc(){ openDrawer("accDrawer","accScrim"); }
+function closeAcc(){ closeDrawer("accDrawer","accScrim"); }
 document.addEventListener("keydown", e=>{
   const open = openDrawers()[0];
   if(!open) return;
   if(e.key === "Escape"){
     e.preventDefault();
-    closeDrawer(open.id, open.id === "glossDrawer" ? "glossScrim" : "scopeScrim");
+    closeDrawer(open.id, {glossDrawer:"glossScrim", ratesDrawer:"ratesScrim",
+                          accDrawer:"accScrim", scopeDrawer:"scopeScrim"}[open.id]);
     return;
   }
   if(e.key !== "Tab") return;
@@ -2065,6 +2220,8 @@ function setKPI(id,n,l,s,cls){
   e.querySelector(".s").textContent = s||"";
 }
 function fmt(n,d){ return isFinite(n) ? n.toLocaleString("en-US",{minimumFractionDigits:d||0,maximumFractionDigits:d||0}) : "-"; }
+/* Money always reads as money: leading $, thousands separators, no bare decimals. */
+function money(n,d){ return isFinite(n) ? "$" + fmt(n, d === undefined ? 0 : d) : "-"; }
 function fmtSize(mb){
   if(mb >= 1024) return fmt(mb/1024,2)+" GB";
   if(mb >= 1) return fmt(mb,1)+" MB";
