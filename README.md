@@ -196,5 +196,14 @@ two in sync if you change them.
 
 ## License
 
-MIT. Estimates only. Verify against your own organization status dashboard and your Esri
-agreement before using any figure commercially.
+MIT. In short: anyone may use, copy, change and redistribute this, including commercially, as
+long as the copyright line and the license text stay with it. That is deliberate. The point of
+publishing it is that other ArcGIS Online administrators can use it.
+
+Worth knowing either way: this is a single client-side HTML file served from a public URL, so
+anyone who opens the page can read the entire source from their browser. No license or repository
+setting changes that. A license governs what someone may legally do with the code, not whether
+they can see it.
+
+Estimates only. Verify against your own organization status dashboard and your Esri agreement
+before using any figure commercially.

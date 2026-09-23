@@ -217,12 +217,19 @@ button.primary:hover{background:var(--accent-2);border-color:var(--accent-2);col
 .drawer-hd{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;
   padding:19px 22px 15px;border-bottom:1px solid var(--line);flex:none}
 .drawer-hd h3{margin:0;font-size:15.5px;font-weight:650;letter-spacing:-.01em}
-.drawer-hd p{margin:6px 0 0;font-size:12.5px;color:var(--dim);max-width:46ch}
+.drawer-hd p{margin:6px 0 0;font-size:12.5px;color:var(--dim)}
 .drawer-x{flex:none;border:none;background:none;color:var(--dim-2);
   font-size:23px;line-height:1;padding:1px 7px;cursor:pointer;border-radius:3px}
 .drawer-x:hover{background:var(--panel-2);color:var(--text);border-color:transparent}
 .drawer-body{padding:19px 22px 34px;overflow-y:auto;flex:1;min-height:0}
 .drawer-body pre{font-size:11.5px}
+.primer{border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:5px;
+  background:var(--panel-2);padding:14px 16px;margin:0 0 18px}
+.primer h4{margin:0 0 8px;font-size:13px;font-weight:650}
+.primer ol{margin:0 0 11px;padding-left:18px;font-size:12.5px;color:var(--dim);line-height:1.65}
+.primer p{margin:0 0 9px;font-size:12.5px;color:var(--dim);line-height:1.6}
+.primer p:last-child{margin-bottom:0}
+.primer code{font-size:11.5px;padding:1px 4px}
 .gloss{margin:0}
 .gl-t{padding:0 0 15px;margin:0 0 15px;border-bottom:1px solid var(--line-2)}
 .gl-t:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
@@ -893,8 +900,7 @@ footer strong{color:var(--dim)}
       <p>Questions, corrections, or a rate that has changed since this was published?
         <a href="https://www.linkedin.com/in/briankingery87/" target="_blank" rel="noopener">Reach me on LinkedIn</a>
         or open an issue on
-        <a href="https://github.com/briankingery87/agol-credit-planner" target="_blank" rel="noopener">GitHub</a>.
-        The source is MIT licensed, so fork it and make it yours.</p>
+        <a href="https://github.com/briankingery87/agol-credit-planner" target="_blank" rel="noopener">GitHub</a>.</p>
     </div>
   </div>
 </footer>
@@ -1032,35 +1038,70 @@ footer strong{color:var(--dim)}
   <div class="drawer-hd">
     <div>
       <h3 id="scopeTitle">Scope your data</h3>
-      <p>Measure real geometry in ArcGIS Pro, from a local feature class or a hosted feature
-         service, then load it straight into the table. Edit the two settings at the top of the
-         script, run it, and paste everything it prints into step 2.</p>
+      <p>Measure real geometry in ArcGIS Pro, from layers saved on your computer or hosted in
+         ArcGIS Online, then load it straight into the table. You only edit a list of layer names
+         at the top of the script; the rest is written for you.</p>
     </div>
     <button class="drawer-x" onclick="closeScope()" aria-label="Close">&times;</button>
   </div>
   <div class="drawer-body">
+      <div class="primer">
+        <h4>First time doing this?</h4>
+        <ol>
+          <li>In ArcGIS Pro, open the <strong>Analysis</strong> tab and click
+              <strong>Python</strong>, then <strong>Python Window</strong>. A panel opens at the
+              bottom with a <code>&gt;&gt;&gt;</code> prompt.</li>
+          <li>Click <strong>Copy script</strong> below, then paste it into that panel. Do not press
+              Enter yet.</li>
+          <li>Edit only the list at the top, then press <strong>Enter</strong> to run it.</li>
+        </ol>
+        <p><strong>The <code>#</code> character turns a line off.</strong> Anything after a
+          <code>#</code> is ignored, so the script ships with example lines switched off. Delete the
+          <code>#</code> at the start of a line to switch it on, or type one at the start to switch
+          it off. That is the only Python you need to know here: no line ever has to be deleted.</p>
+        <p>Keep the quotes around each path and the comma at the end of each line. Leave the
+          <code>r</code> in front of a Windows path; it stops the backslashes causing trouble.</p>
+      </div>
     <div class="codewrap">
       <div class="codebar">
           <span class="lbl">Step 1 &middot; run in the ArcGIS Pro Python window</span>
           <button class="ghost noprint" onclick="copyCode(this)">Copy script</button>
         </div>
-<pre><span class="c"># ============ EDIT THESE TWO SETTINGS ============</span>
-<span class="c"># Local feature classes, hosted feature service URLs, or both.</span>
+<pre><span class="c">#  ======================================================</span>
+<span class="c">#  STEP 1  -  EDIT THE LIST BELOW. NOTHING ELSE.</span>
+<span class="c">#</span>
+<span class="c">#  Put each layer on its own line, inside the [ ] brackets.</span>
+<span class="c">#  A line starting with #  is OFF and will be skipped.</span>
+<span class="c">#  Delete the #  to turn a line ON.</span>
+<span class="c">#  Keep the quotes and the comma at the end of every line.</span>
+<span class="c">#  ======================================================</span>
+
 SOURCES = [
-    r<span class="s">"C:\data\Base.gdb\Parcels"</span>,
-    <span class="s">"https://services.arcgis.com/XXXX/arcgis/rest/services/Roads/FeatureServer/0"</span>,
+
+    <span class="c"># --- Layers saved on your computer -------------------</span>
+    <span class="c"># Copy the path from the ArcGIS Pro Catalog pane.</span>
+    r<span class="s">"C:\GIS\Base.gdb\Parcels"</span>,
+    <span class="c"># r"C:\GIS\Base.gdb\Roads",</span>
+    <span class="c"># r"C:\GIS\Shapefiles\Zoning.shp",</span>
+
+    <span class="c"># --- Layers hosted in ArcGIS Online ------------------</span>
+    <span class="c"># Open the item page, copy the service URL, add /0 at the end.</span>
+    <span class="c"># "https://services.arcgis.com/ab12/arcgis/rest/services/Roads/FeatureServer/0",</span>
+
 ]
-<span class="c"># Only needed for secured services. Leave blank for public ones.</span>
-PORTAL = (<span class="s">""</span>, <span class="s">""</span>)   <span class="c"># ("https://myorg.maps.arcgis.com", "username")</span>
-<span class="c"># =================================================</span>
+
+<span class="c"># Only needed for PRIVATE hosted layers. Leave both empty otherwise.</span>
+PORTAL_URL  = <span class="s">""</span>     <span class="c"># "https://myorg.maps.arcgis.com"</span>
+PORTAL_USER = <span class="s">""</span>     <span class="c"># "jsmith_myorg"</span>
+
+<span class="c">#  ============ STOP EDITING HERE =======================</span>
 
 <span class="k">import</span> arcpy, statistics
 
-<span class="k">if</span> PORTAL[0] <span class="k">and</span> <span class="k">any</span>(<span class="k">str</span>(x).lower().startswith(<span class="s">"http"</span>) <span class="k">for</span> x <span class="k">in</span> SOURCES):
-    arcpy.SignInToPortal(PORTAL[0], PORTAL[1])
+<span class="k">if</span> PORTAL_URL <span class="k">and</span> <span class="k">any</span>(<span class="k">str</span>(x).lower().startswith(<span class="s">"http"</span>) <span class="k">for</span> x <span class="k">in</span> SOURCES):
+    arcpy.SignInToPortal(PORTAL_URL, PORTAL_USER)
 
 <span class="k">def</span> measure(src):
-    <span class="c"># A service URL has to become a layer before a cursor can read it.</span>
     <span class="k">if</span> <span class="k">str</span>(src).lower().startswith(<span class="s">"http"</span>):
         lyr = arcpy.management.MakeFeatureLayer(src, <span class="s">"_scope_tmp"</span>)[0]
         name = arcpy.Describe(lyr).name
@@ -1078,7 +1119,7 @@ PORTAL = (<span class="s">""</span>, <span class="s">""</span>)   <span class="c
             arcpy.management.Delete(<span class="s">"_scope_tmp"</span>)
     <span class="k">if not</span> v:
         <span class="k">return None</span>
-    name = <span class="k">str</span>(name).replace(<span class="s">"|"</span>, <span class="s">"-"</span>)   <span class="c"># pipe is the field separator</span>
+    name = <span class="k">str</span>(name).replace(<span class="s">"|"</span>, <span class="s">"-"</span>)
     <span class="k">return</span> <span class="s">"PLANNER|{}|{}|{:.1f}|{}"</span>.format(
         name, <span class="k">len</span>(v), statistics.mean(v), <span class="k">len</span>(f))
 
@@ -1091,13 +1132,13 @@ lines = []
     <span class="k">except</span> Exception <span class="k">as</span> e:
         arcpy.AddWarning(<span class="s">"skipped {}: {}"</span>.format(src, e))
 
-<span class="c"># Nothing else is printed. Copy all of it into step 2.</span>
 <span class="k">print</span>(<span class="s">"\n"</span>.join(lines))</pre>
         <p style="font-size:12px;color:var(--dim-2);margin:11px 0 0">
-          Only PLANNER lines are printed, so the whole output can be copied straight across. A source
-          that fails, has no geometry, or that you cannot reach is skipped with a warning instead of
-          stopping the run. Measuring a hosted service reads every feature over the wire, so try one
-          layer before pointing it at a long list.
+          Only PLANNER lines are printed, so select the whole output and copy it across. A layer
+          that fails, has no geometry, or that you cannot reach is skipped with a warning rather
+          than stopping the run, so one bad path will not cost you the others. Measuring a hosted
+          layer reads every feature over the network, so start with one before pointing it at a long
+          list.
         </p>
     </div>
     <div class="codewrap" style="margin-top:22px">
