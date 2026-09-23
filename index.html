@@ -1756,18 +1756,34 @@ function renderAdvice(yearStd, yearNoFeat, months, price, avail, featMB1, spend)
   const runnerUp = viable.length > 1
     ? viable.filter(o=>o !== win).reduce((a,b)=>b.cost < a.cost ? b : a) : null;
 
-  let html = '<tr><th>Option</th><th class="num">Credit blocks</th><th class="num">Cost over '+months+' months</th></tr>';
+  /* Every Premium option still buys credits. Showing only a blocks count and a
+     total let a reader assume the subscription REPLACES the credit purchase, so
+     the three cost components get their own columns and each Premium row states
+     how many blocks it actually saves against Standard. */
+  const stdOpt = opts[0];
+  let html = '<tr><th>Option</th><th class="num">Credit blocks you still buy</th>'
+           + '<th class="num">Subscription over '+months+' months</th>'
+           + '<th class="num">Total over '+months+' months</th></tr>';
   opts.forEach(o=>{
     const isWin = win && o === win;
     const style = o.viable ? (isWin ? ' style="background:var(--row-hover)"' : '') : ' style="opacity:.55"';
+    let blockCell;
+    if(!o.viable){ blockCell = '-'; }
+    else if(!o.blocks){ blockCell = 'none'; }
+    else {
+      blockCell = fmt(o.blocks,0)+' &times; 1,000<br><span style="color:var(--dim-2)">'+money(o.credits)+'</span>';
+      if(o.key !== "std" && stdOpt.viable){
+        const saved = stdOpt.blocks - o.blocks;
+        blockCell += '<br><span style="color:var(--dim-2)">'
+          + (saved > 0 ? fmt(saved,0)+' fewer than Standard' : 'same as Standard')+'</span>';
+      }
+    }
     html += '<tr'+style+'><td><strong>'+o.name+'</strong>'
           + (isWin ? ' <span style="color:var(--good);font-weight:650">&#10003; cheapest</span>' : '')
           + '<br><span style="color:var(--dim-2)">'+(o.block || o.note)+'</span></td>'
-          + '<td class="num">'+(o.viable ? (o.blocks ? o.blocks+' &times; 1,000' : 'none') : '-')+'</td>'
-          + '<td class="num">'+(o.viable ? money(o.cost) : '<span style="color:var(--dim-2)">not viable</span>')
-          + (o.viable && o.sub ? '<br><span style="color:var(--dim-2)">'+money(o.sub)+' subscription'
-              + (o.credits ? ' + '+money(o.credits)+' credits' : '')+'</span>'
-            : '')+'</td></tr>';
+          + '<td class="num">'+blockCell+'</td>'
+          + '<td class="num">'+(o.viable ? (o.sub ? money(o.sub) : '<span style="color:var(--dim-2)">none</span>') : '-')+'</td>'
+          + '<td class="num">'+(o.viable ? '<strong>'+money(o.cost)+'</strong>' : '<span style="color:var(--dim-2)">not viable</span>')+'</td></tr>';
   });
   tb.innerHTML = html;
 
@@ -1776,9 +1792,11 @@ function renderAdvice(yearStd, yearNoFeat, months, price, avail, featMB1, spend)
     + fmt(avail,0) + " available. " + (years > 1 ? "Shortfalls are summed across all " + years + " subscription years, because unused credits do not carry over. " : "")
     + "This accounts for your included credits, so the crossover here sits a little above the raw break-even in section 05."
     + (spend && spend.grand > 0 && spend.featShare < 0.25
-        ? " Every Premium row below buys almost the same number of credit blocks as Standard, because"
-          + " Premium removes feature storage only and feature storage is a small part of this plan."
-        : "");
+        ? " Read the Premium rows as subscription <em>plus</em> credits, not instead of them."
+          + " Premium removes feature storage only, and feature storage is a small part of this plan,"
+          + " so a Premium row buys nearly the same blocks as Standard and adds a subscription on top."
+        : " Read the Premium rows as subscription <em>plus</em> credits: Premium removes feature storage"
+          + " from the credit model but every other kind of burn still bills the same.");
 
   if(!win){
     vd.innerHTML = '<p style="margin:0;font-size:14px"><strong>Nothing here holds this much data.</strong></p>'
@@ -1790,8 +1808,8 @@ function renderAdvice(yearStd, yearNoFeat, months, price, avail, featMB1, spend)
 
   const lead = win.blocks
     ? (win.key === "std"
-        ? "Buy " + win.blocks + " block" + (win.blocks>1?"s":"") + " of 1,000 credits and stay on Standard."
-        : "Move to " + win.short + " and buy " + win.blocks + " block" + (win.blocks>1?"s":"") + " of 1,000 credits.")
+        ? "Buy " + fmt(win.blocks,0) + " block" + (win.blocks>1?"s":"") + " of 1,000 credits and stay on Standard."
+        : "Move to " + win.short + " and buy " + fmt(win.blocks,0) + " block" + (win.blocks>1?"s":"") + " of 1,000 credits.")
     : (win.key === "std"
         ? "Buy nothing. Your included credits cover this plan."
         : "Move to " + win.short + ". No credit purchase needed on top of it.");
@@ -1820,9 +1838,13 @@ function renderAdvice(yearStd, yearNoFeat, months, price, avail, featMB1, spend)
   if(win.key === "std" && spend && spend.featShare < 0.25 && spend.grand > 0){
     const removes = spend.feature*price;
     const cheapestSub = Math.min(...TIERS.map(t=>t[3]))*months;
-    bullets.push("Premium was rejected for a reason: it would remove " + money(removes)
-      + " of credits and cost " + money(cheapestSub) + " in subscription at the entry level."
-      + " It only touches feature storage, which is not what you are spending on.");
+    const m2 = opts.find(o=>o.key === "m2");
+    bullets.push("Premium does not replace the credit purchase. Moving to M2 would still mean buying "
+      + (m2 && m2.viable ? fmt(m2.blocks,0) + " block" + (m2.blocks>1?"s":"") : "nearly the same blocks")
+      + ", only " + (m2 && m2.viable ? fmt(Math.max(0,win.blocks-m2.blocks),0) : "a handful")
+      + " fewer than Standard, plus " + money(cheapestSub) + " of subscription. It removes just "
+      + money(removes) + " of credit spend because it only touches feature storage, and that is not"
+      + " what you are spending on.");
   }
   if(win.key === "std" && spend && spend.featShare >= 0.25 && featGB > 100){
     bullets.push("Feature storage is " + fmtSize(featMB1) + ". Re-run this once it grows, because the Premium levels overtake credits as it climbs.");

@@ -210,6 +210,21 @@ const {chromium} = require('playwright');
     truthy('recommendation explains why Premium lost', /only touches feature storage/i.test(imgV));
     truthy('premium panel says Premium is not the lever', /not the lever here/i.test(imgP));
     truthy('absurd block counts suggest an agreement', /account manager/i.test(imgV));
+    /* The second time BK read this table he still took "buy N blocks" to be the
+       alternative to a subscription. The table has to separate the three cost
+       components and say outright how little Premium takes off the block count. */
+    const advHdr = document.querySelectorAll('#advTable tbody tr')[0];
+    ok('options table splits blocks, subscription and total', advHdr.children.length, 4);
+    truthy('blocks column says the credits are still bought',
+      /still buy/i.test(advHdr.children[1].textContent));
+    truthy('subscription has its own column', /subscription/i.test(advHdr.children[2].textContent));
+    const m2Row = document.querySelectorAll('#advTable tbody tr')[2].textContent;
+    truthy('premium row still shows a block purchase', /\u00d7 1,000/.test(m2Row));
+    truthy('premium row states how few blocks it saves', /fewer than Standard/i.test(m2Row));
+    truthy('verdict says Premium adds to, not replaces, the credit buy',
+      /does not replace the credit purchase/i.test(imgV));
+    truthy('note tells the reader to read Premium rows as plus, not instead',
+      /not instead of them/i.test(document.getElementById('advNote').textContent));
 
     // and the opposite case still recommends moving
     reset();
