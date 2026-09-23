@@ -116,6 +116,29 @@ const F = require('./fixtures.js');
     truthy('real credit report is rejected', !!cr.error);
     truthy('real credit report error points at the item report', /item report/i.test(cr.error||''));
 
+    /* --- one drop zone, three reports, routed by header --- */
+    ok('detects an item report', detectReport(F.basic), 'items');
+    ok('detects the real item export', detectReport(F.realHeader), 'items');
+    ok('detects a credit report behind its preamble', detectReport(F.realCreditReport), 'credits');
+    ok('detects a member report', detectReport(F.memberReport), 'members');
+    ok('unknown CSV detects as nothing', detectReport('a,b,c\n1,2,3'), null);
+
+    /* --- member report --- */
+    const mem = parseMemberReport(F.memberReport);
+    truthy('member report parses', !mem.error);
+    ok('member count', mem.n, 5);
+    ok('Creator mapped', mem.counts.creator, 1);
+    ok('Professional mapped', mem.counts.professional, 1);
+    ok('Mobile Worker mapped', mem.counts.mobile, 1);
+    ok('Viewer maps to the zero-credit bucket', mem.counts.editor, 1);
+    ok('unrecognized user type counted, not silently dropped', mem.unknown, 1);
+    ok('disabled accounts flagged', mem.disabled, 1);
+    // 500 Creator + 500 Professional + 250 Mobile Worker + 0 Viewer + 0 unknown
+    ok('included credits from the member mix',
+       USER_TYPES.reduce((a,[k,l,cr])=>a+(mem.counts[k]||0)*cr, 0), 1250);
+    truthy('a member report is not read as an item report',
+       !!parseItemReport(F.memberReport).error);
+
     /* --- the report must not leak into saved or exported state --- */
     ORG = summarizeItems(parseItemReport(F.basic).items);
     save();

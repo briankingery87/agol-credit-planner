@@ -9,13 +9,25 @@ an organization actually has.
 No build step, no dependencies, no network calls. One HTML file that runs entirely in the
 browser. Scenarios are kept in `localStorage` and can be exported to JSON.
 
+## Who it is for
+
+New ArcGIS Online administrators who have just been handed a credit balance and do not yet know
+what drains it, and experienced administrators doing capacity planning for a renewal or a
+proposal. The page opens with two labeled paths, one for auditing an organization that already
+exists and one for scoping something that does not, and a glossary covering every term it uses.
+Sections are marked **input**, **result** or **reference** so it is obvious what you fill in and
+what the tool works out.
+
 ## What it does
 
 - Starts from measurement, not assumption. Drop an ArcGIS Online **item report** CSV into section
   01 and the page reports the real feature and file storage the org is carrying, what it costs per
   month, storage by item type, the largest items, and how much is sitting in the recycle bin or in
   content with zero views. Parsed in the browser, never uploaded, never saved to the browser and
-  never written into an exported scenario. Tested against a 25,485-item production export.
+  never written into an exported scenario, plus the member report reader and the header-based routing that decides which
+of the three reports was dropped. Tested against a 25,485-item production export.
+- Reads the **member report** too, from the same drop zone, and fills in the user type mix that
+  determines your annual credit supply. The header decides which report was dropped.
 - Prefills the planning table from that same report. Rows built this way carry measured megabytes
   and are marked **measured**, so the sizing model is bypassed for them entirely.
 - Sizes hosted feature layers from feature count, vertices per feature and attribute field
@@ -82,7 +94,7 @@ sizing formula, growth compounding, subscription-year resets, the Premium break-
 rounding, the recommendation engine, the measurement parser, state round-trips, and edge cases
 (zero credit price, one-month horizon, partial second year, empty scenario, negative growth).
 
-`test/csv.js` - 62 assertions on the item report reader, using synthetic reports in
+`test/csv.js` - 77 assertions on the report readers, using synthetic reports in
 `test/fixtures.js`: quoted commas, doubled quotes, embedded newlines, CRLF, a UTF-8 BOM, thousands
 separators, reordered and differently-cased headers, `(MB)` unit suffixes, recycle-bin and
 zero-view waste detection, per-item credit rating, rejection of a credit report uploaded by
@@ -90,15 +102,42 @@ mistake (including the three preamble lines a real credit report starts with), t
 of a real production export, and confirmation that report contents never reach `localStorage` or an
 exported scenario.
 
-### A note on validating against a real org
+### Validation against real organizations
 
-Run both an item report and a monthly credit report for the same period and compare. On the org
-this was tested against, non-feature storage predicted 869 credits a month against an actual 944,
-an 8% gap explained by the item report being a point-in-time snapshot. Feature storage predicted
-33,029 against an actual 196, because that org is on a Premium feature data store and feature
-storage had left the credit model. Selecting Premium in section 02 brings the prediction back in
-line. If your own numbers are off by two orders of magnitude on feature storage only, that is the
-first thing to check.
+The rates were checked against three production ArcGIS Online organizations by predicting credit
+consumption from an item report and comparing it to the org-level rows of the monthly credit
+report for the same period.
+
+| Organization | Feature data store | Feature predicted | Feature actual | Error |
+|---|---|---|---|---|
+| A, 52 items | Standard | 62.48 | 61.97 | **+0.8%** |
+| B, 115 items | Standard | 25.14 | 21.55 | +16.7% |
+| C, 25,485 items | Premium | 33,029 | 195.69 | +16,778% |
+
+A second pass compared predictions against the per-item credit figures both Standard
+organizations publish in **Organization > Status > Credits > Items using the most storage
+credits**, which can be downloaded as CSV. Across **45 individual layers**, predictions for
+layers that did not change during the period landed within **4 to 5%** of actual consumption,
+tightly clustered. Every item outside that band was either created after the billing period
+closed or is a layer the organization actively edits. About 1.5% of the residual is the
+dashboard's 30-day window against a 30.44-day billing month.
+
+**Organization A confirms the published rate.** Excluding items created after the billing period
+closes the gap to +0.2%, an implied 2.3804 credits per 10 MB per month against a published 2.4.
+File storage matched to 0.0%.
+
+**Organization B is snapshot drift, not model error.** Its item report is three weeks after the
+billing period. Joining the dashboard's per-item credit figures against per-item storage shows
+static layers landing within 4 to 5% while two actively edited layers land 43% and 52% high. The
+model is right; the snapshot is newer than the bill.
+
+**Organization C is on a Premium feature data store**, so feature storage does not consume credits
+at all and the comparison is meaningless until Premium is selected in section 02. With it selected
+the tool predicts 869 credits a month against an actual 944, within 8%.
+
+The practical rule, which section 01 now states on screen: a modest overprediction is drift
+between a snapshot and a billing period. An overprediction of two orders of magnitude on feature
+storage alone means the organization is on Premium.
 
 ```bash
 npm install --no-save playwright

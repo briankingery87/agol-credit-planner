@@ -63,3 +63,13 @@ module.exports.realCreditReport = [
 'Credits Consumed by,App Title,Notebooks - Interactive,Geocoding,Feature Storage,File Storage,Imagery Storage,Tile Storage',
 'Example Org,,0.0,0.0,195.69,410.62,300.97,221.81'
 ].join('\n');
+
+// Member report, real header from a production export, invented rows.
+module.exports.memberReport = [
+'Username,Name,Email,Profile Visibility,My Esri Access,User Type,Role,Available Credits,Assigned Credits,Last Login Date,Date Created,Add-On Apps,"# of Items Owned","# of Groups Owned","# of Groups Total",Login Type,IdP Username,Member Account Status,Verified Email Status,Multifactor Authentication Exempt,Member Categories,Multifactor Authentication',
+'a@example.com_Ex,A Person,a@example.com,account,enabled,Creator,Data Editor,250.0,250.0,2026-07-08 16:18:08,2025-08-20 17:19:43,,0,0,1,enterprise,a@example.com,enabled,false,No,,',
+'b@example.com_Ex,B Person,b@example.com,account,enabled,Professional,account_publisher,0,0,2026-08-28 20:21:15,2025-06-19 18:23:49,,0,0,1,enterprise,b@example.com,enabled,false,No,,',
+'c@example.com_Ex,C Person,c@example.com,account,enabled,Mobile Worker,Field Worker,0,0,2026-08-28 20:21:15,2025-06-19 18:23:49,,0,0,1,enterprise,c@example.com,disabled,false,No,,',
+'d@example.com_Ex,D Person,d@example.com,account,enabled,Viewer,Viewer,0,0,2026-08-28 20:21:15,2025-06-19 18:23:49,,0,0,1,enterprise,d@example.com,enabled,false,No,,',
+'e@example.com_Ex,E Person,e@example.com,account,enabled,Something New,Custom,0,0,2026-08-28 20:21:15,2025-06-19 18:23:49,,0,0,1,enterprise,e@example.com,enabled,false,No,,'
+].join('\n');

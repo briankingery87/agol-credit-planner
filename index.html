@@ -66,6 +66,7 @@ header.top h1{font-size:30px;font-weight:650;letter-spacing:-.02em;margin:8px 0 
 .byline .lnk{font-size:12.5px;margin-top:5px}
 .byline img.tg{width:172px;height:auto;flex:none}
 .lede{display:grid;grid-template-columns:1.55fr 1fr;gap:34px;margin-top:14px;align-items:start}
+.lede.one{grid-template-columns:1fr;max-width:118ch}
 .lede p{margin:0 0 10px;color:var(--dim);font-size:14.5px}
 .lede p strong{color:var(--text);font-weight:600}
 .callout{
@@ -84,7 +85,41 @@ header.top h1{font-size:30px;font-weight:650;letter-spacing:-.02em;margin:8px 0 
 .kpi.good .n{color:var(--good)} .kpi.warn .n{color:var(--warn)} .kpi.bad .n{color:var(--bad)}
 
 /* sections */
-section{margin:0 0 38px;scroll-margin-top:16px}
+section{margin:0 0 38px;scroll-margin-top:62px}
+
+/* sticky section nav */
+.secnav{position:sticky;top:0;z-index:30;background:rgba(247,248,250,.93);
+  backdrop-filter:saturate(1.6) blur(8px);border-bottom:1px solid var(--line);
+  margin:0 -22px 26px;padding:0 22px}
+.secnav ol{display:flex;gap:2px;list-style:none;margin:0;padding:0;overflow-x:auto;
+  scrollbar-width:thin}
+.secnav a{display:block;white-space:nowrap;padding:10px 9px;font-size:12px;color:var(--dim);
+  border-bottom:2px solid transparent;text-decoration:none}
+.secnav a:hover{color:var(--text);border-bottom-color:var(--line)}
+.secnav a.on{color:var(--accent);border-bottom-color:var(--accent);font-weight:600}
+.secnav a b{font-weight:700;color:var(--dim-2);margin-right:5px;font-size:11px}
+.secnav a.on b{color:var(--accent)}
+.secnav .gl{margin-left:auto;flex:none}
+
+/* section role badges */
+.role-tag{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  border-radius:9px;padding:2px 8px;vertical-align:2px}
+.role-in{color:var(--accent);border:1px solid var(--accent);background:var(--row-hover)}
+.role-out{color:var(--c-feature);border:1px solid var(--c-feature)}
+.role-ref{color:var(--dim-2);border:1px solid var(--line)}
+
+/* how to use */
+.howto{border:1px solid var(--line);border-radius:6px;background:var(--panel);padding:20px 22px;margin:0 0 30px}
+.howto h3{margin:0 0 4px;font-size:15px;font-weight:650}
+.howto .ph{font-size:12.5px;color:var(--dim-2);margin:0 0 16px}
+.tracks{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.tracks>*{min-width:0}
+.track{border:1px solid var(--line);border-radius:5px;background:var(--panel-2);padding:14px 16px}
+.track h4{margin:0 0 3px;font-size:13.5px;font-weight:650}
+.track .who{font-size:12px;color:var(--dim-2);margin:0 0 10px}
+.track ol{margin:0;padding-left:18px;font-size:13px;color:var(--dim);line-height:1.65}
+.track ol strong{color:var(--text);font-weight:600}
+.howto .foot{font-size:12.5px;color:var(--dim);margin:15px 0 0;padding-top:13px;border-top:1px solid var(--line-2)}
 h2{font-size:17px;font-weight:650;letter-spacing:-.01em;margin:0 0 4px;display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
 h2 .num{font-size:11px;font-weight:700;color:var(--accent);letter-spacing:.1em}
 .h2rule{height:1px;background:var(--line);margin:10px 0 16px}
@@ -172,6 +207,11 @@ button.primary:hover{background:var(--accent-2);border-color:var(--accent-2);col
 .drawer-x:hover{background:var(--panel-2);color:var(--text);border-color:transparent}
 .drawer-body{padding:19px 22px 34px;overflow-y:auto;flex:1;min-height:0}
 .drawer-body pre{font-size:11.5px}
+.gloss{margin:0}
+.gl-t{padding:0 0 15px;margin:0 0 15px;border-bottom:1px solid var(--line-2)}
+.gl-t:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.gloss dt{font-size:13.5px;font-weight:650;margin:0 0 4px}
+.gloss dd{margin:0;font-size:13px;color:var(--dim);line-height:1.62}
 @media (prefers-reduced-motion:reduce){.drawer,.scrim{transition:none}}
 input:focus,select:focus,button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 input[readonly]{background:#eef1f5;color:var(--dim)}
@@ -245,6 +285,9 @@ svg{display:block;width:100%;height:auto;overflow:visible}
 .ref td{padding:7px 9px;border-bottom:1px solid var(--line-2);vertical-align:top}
 .ref td:last-child,.ref th:last-child{text-align:right;white-space:nowrap}
 .ref.tiers td,.ref.tiers th{white-space:normal;vertical-align:middle}
+/* the rates table wants a nowrap right column; a prose table does not */
+.ref.prose td,.ref.prose td:last-child{white-space:normal;text-align:left;vertical-align:top}
+.ref.prose td:first-child{width:38%}
 .ref.tiers th{font-size:11px}
 .ref.tiers td.num,.ref.tiers th.num{text-align:right}
 .ref.tiers input[type=number]{width:74px;display:inline-block;padding:4px 6px;font-size:12.5px}
@@ -266,9 +309,10 @@ footer p{margin:0 0 9px}
 footer strong{color:var(--dim)}
 
 @media (max-width:1000px){
-  .lede,.sub,.sub.two,.grid3,.grid2,.charts,footer .cols{grid-template-columns:1fr}
+  .lede,.sub,.sub.two,.grid3,.grid2,.charts,footer .cols,.tracks{grid-template-columns:1fr}
   .kpis{grid-template-columns:1fr 1fr}
   .tip::after{width:210px}
+  .secnav{margin:0 -16px 20px;padding:0 16px}
 }
 @media print{
   @page{size:letter portrait;margin:0.45in}
@@ -277,6 +321,9 @@ footer strong{color:var(--dim)}
   .wrap{max-width:none;width:auto;padding:0;margin:0}
   .noprint{display:none!important}
   a{color:#111;border-bottom:none}
+  .secnav{display:none!important}
+  .howto{break-inside:avoid;page-break-inside:avoid}
+  .tracks{display:grid!important;grid-template-columns:1fr 1fr;gap:10px}
   .panel,.chartcard,.scroller,.kpi,.callout,.band{background:#fff;border-color:#bbb}
 
   /* every multi-column grid collapses so nothing is squeezed off the sheet */
@@ -362,7 +409,7 @@ footer strong{color:var(--dim)}
       <img class="tg" src="assets/tg-geospatial-graylime.png" alt="Timmons Group Geospatial Solutions" width="172" height="68">
     </div>
   </div>
-  <div class="lede">
+  <div class="lede one">
     <div>
       <p>Credits are the currency used across ArcGIS. They are spent on two different things, and
          conflating them is where most credit anxiety comes from. <strong>Storage</strong> is a
@@ -375,41 +422,89 @@ footer strong{color:var(--dim)}
          geometry in ArcGIS Pro and loads it straight into the table. Nothing is sent anywhere;
          everything runs in your browser.</p>
     </div>
-    <div class="callout">
-      <h4>Use it in three passes</h4>
-      <ul>
-        <li>Set your credit supply from your user type mix or your real balance.</li>
-        <li>List what you intend to host. Use the presets as starting points and correct them.</li>
-        <li>Measure your real geometry in ArcGIS Pro and load it in, then re-read the charts.</li>
-      </ul>
-    </div>
   </div>
 </header>
 
+<nav class="secnav noprint" aria-label="Jump to a section">
+  <ol>
+    <li><a href="#sec-org"><b>01</b>Your org</a></li>
+    <li><a href="#sec-supply"><b>02</b>Credit supply</a></li>
+    <li><a href="#sec-content"><b>03</b>What you host</a></li>
+    <li><a href="#sec-transactions"><b>04</b>Transactions</a></li>
+    <li><a href="#sec-burn"><b>05</b>Burn</a></li>
+    <li><a href="#sec-advice"><b>06</b>What to do</a></li>
+    <li><a href="#sec-scenario"><b>07</b>Save</a></li>
+    <li><a href="#sec-reference"><b>08</b>Rates</a></li>
+    <li class="gl"><a href="#" onclick="openGloss();return false;">Glossary</a></li>
+  </ol>
+</nav>
+
+<div class="howto">
+  <h3>How to use this</h3>
+  <p class="ph">Two ways in, depending on whether the content already exists. Both end in the same place: a credit number you can defend and a recommendation on what to buy.</p>
+  <div class="tracks">
+    <div class="track">
+      <h4>You already have an organization</h4>
+      <p class="who">Auditing what you spend today, or planning the next renewal.</p>
+      <ol>
+        <li>Export an <strong>item report</strong> and a <strong>member report</strong> from Organization &gt; Status &gt; Reports, and drop both into section 01. Real storage, real user mix, no guessing.</li>
+        <li>In section 03, click <strong>Prefill from item report</strong> to build the table from what you actually host.</li>
+        <li>Add the transactions you expect in a typical month in section 04.</li>
+        <li>Read section 05 for the burn and section 06 for whether to buy credits or move to a Premium data store.</li>
+      </ol>
+    </div>
+    <div class="track">
+      <h4>You are planning something new</h4>
+      <p class="who">Scoping a project, writing a proposal, sizing a migration.</p>
+      <ol>
+        <li>Set your user type mix in section 02 so the tool knows what you already get included.</li>
+        <li>In section 03, start from a <strong>preset</strong> and correct it, or use <strong>Scope data</strong> to measure real geometry in ArcGIS Pro and load it straight in.</li>
+        <li>Put bulk geocoding and tile generation under one-time charges in section 04 so they do not inflate the monthly figure.</li>
+        <li>Read section 05, then copy the text summary from section 07 into your proposal.</li>
+      </ol>
+    </div>
+  </div>
+  <p class="foot"><strong>Everything runs in your browser.</strong> No account, no sign-in, no upload. Your scenario is kept in this browser and can be exported to a file; uploaded reports are never saved anywhere. Sections 01 to 04 are what you put in, 05 and 06 are what comes out, and 08 is the rate card everything is built on.</p>
+</div>
+
 <!-- 1 -->
 <section id="sec-org" class="noprint">
-  <h2><span class="num">01</span> Start from your org <span class="opt">optional</span></h2>
+  <h2><span class="num">01</span> Start from your org <span class="role-tag role-in">input</span> <span class="opt">optional</span></h2>
   <div class="h2rule"></div>
   <div class="sub two">
     <p>Everything below this section is a forecast. This one is a measurement. Export an item report
        from your organization and drop it here, and the page reads the real storage your org is
        carrying right now, what it costs per month at published rates, and how much of it is sitting
        in content nobody has opened.</p>
-    <p>In ArcGIS Online: <strong>Organization &gt; Status &gt; Reports &gt; Create report &gt;
-       Item report</strong>, then download the CSV. The file is parsed in your browser and never
-       leaves this page, it is not saved to this browser, and it is not written into your exported
-       scenario. Reload the page and it is gone.</p>
+    <p>In ArcGIS Online: <strong>Organization &gt; Status &gt; Reports &gt; Create report</strong>.
+       The <strong>item report</strong> gives you the storage picture below; the
+       <strong>member report</strong> fills in your credit supply in section 02. Both are parsed in
+       your browser and never leave this page, are not saved to this browser, and are not written
+       into your exported scenario. Reload the page and they are gone.</p>
   </div>
 
   <div class="drop noprint" id="orgDrop" tabindex="0" role="button"
        aria-label="Upload an ArcGIS Online item report CSV">
     <div class="drop-i">
-      <strong>Drop your item report CSV here</strong>
-      <span>or click to choose a file</span>
+      <strong>Drop an item report or member report CSV here</strong>
+      <span>or click to choose a file. The header decides which one it is.</span>
     </div>
     <input type="file" id="orgFile" accept=".csv,text/csv" hidden onchange="orgPick(this)">
   </div>
   <p class="msg" id="orgMsg" style="margin:10px 0 0"></p>
+
+  <div id="orgMembers" hidden>
+    <div class="panel" style="margin-top:18px">
+      <h3>Members and included credits</h3>
+      <p class="ph">From the member report. This is where your annual credit supply comes from.</p>
+      <table class="ref" id="memberTable"><tbody></tbody></table>
+      <p id="memberNote" style="font-size:12.5px;color:var(--dim-2);margin:13px 0 0"></p>
+      <div class="btnrow noprint">
+        <button class="primary" onclick="applyMembers()">Apply to section 02</button>
+        <button class="ghost" onclick="membersClear()">Clear</button>
+      </div>
+    </div>
+  </div>
 
   <div id="orgOut" hidden>
     <div class="kpis" style="margin-top:18px">
@@ -441,9 +536,12 @@ footer strong{color:var(--dim)}
 
 <!-- 2 -->
 <section id="sec-supply">
-  <h2><span class="num">02</span> Your credit supply</h2>
+  <h2><span class="num">02</span> Your credit supply <span class="role-tag role-in">input</span></h2>
   <div class="h2rule"></div>
   <div class="sub">
+    <p><strong>Do this:</strong> enter how many of each user type your organization holds, or drop a
+       member report into section 01 and apply it. If you already know your balance, skip the
+       counting and enter it directly.</p>
     <p>Every subscription includes a pool of credits shared by the organization, sized by the user
        types you hold. Creator, Professional and Professional Plus include 500 each; Mobile Worker
        and Contributor include 250. Viewer and Editor include none.</p>
@@ -475,13 +573,16 @@ footer strong{color:var(--dim)}
 
 <!-- 3 -->
 <section id="sec-content">
-  <h2><span class="num">03</span> What you are hosting</h2>
+  <h2><span class="num">03</span> What you are hosting <span class="role-tag role-in">input</span></h2>
   <div class="h2rule"></div>
   <div class="sub two">
-    <p>One row per hosted item. Feature layers are sized from geometry and attributes, because vertex
-       count is the dominant term in a hosted feature layer and attribute width is second. Imagery,
-       tile caches, packages, documents and attachments are billed on their file size instead, so
-       enter those directly in GB.</p>
+    <p><strong>Do this:</strong> build a row for everything you host or intend to host. Three ways in,
+       best first: <strong>Prefill from item report</strong> if the content exists,
+       <strong>Scope data</strong> to measure real geometry in ArcGIS Pro, or a <strong>preset</strong>
+       you then correct.</p>
+    <p>Feature layers are sized from geometry and attributes, because vertex count is the dominant term
+       in a hosted feature layer and attribute width is second. Imagery, tile caches, packages, documents
+       and attachments are billed on their file size instead, so enter those directly in GB.</p>
     <p>Hover any column heading for what it means and where the number comes from. The presets are
        starting points drawn from typical production data, not measurements of yours. Scope data,
        in the buttons below the table, replaces them with your own measured values in about two
@@ -537,9 +638,12 @@ footer strong{color:var(--dim)}
 
 <!-- 4 -->
 <section id="sec-transactions">
-  <h2><span class="num">04</span> Transactions and analysis</h2>
+  <h2><span class="num">04</span> Transactions and analysis <span class="role-tag role-in">input</span></h2>
   <div class="h2rule"></div>
   <div class="sub two">
+    <p><strong>Do this:</strong> put recurring work in the left panel and one-time setup work in the
+       right. Getting that split right is the difference between a credible monthly figure and one that
+       is inflated by work you only do once.</p>
     <p>These are the line items that surprise people. Storing a few million polygons is cheap and
        predictable. Geocoding a large address table, generating a tile cache, or leaving an advanced
        notebook running is neither. Everything in this section bills identically whether you are on a
@@ -557,9 +661,11 @@ footer strong{color:var(--dim)}
 
 <!-- 5 -->
 <section id="sec-burn">
-  <h2><span class="num">05</span> Burn</h2>
+  <h2><span class="num">05</span> Burn <span class="role-tag role-out">result</span></h2>
   <div class="h2rule"></div>
   <div class="sub two">
+    <p><strong>Read this:</strong> the four numbers across the top are the answer. Everything below
+       them shows how it arrives and when it breaks.</p>
     <p>The left chart runs cumulative spend inside each subscription year against your available
        credits, and resets at each anniversary because unused subscription credits do not carry over.
        The crossing point is the month you would need to buy more. Hover for the numbers at any month.</p>
@@ -630,10 +736,10 @@ footer strong{color:var(--dim)}
 
 <!-- 6 -->
 <section id="sec-advice">
-  <h2><span class="num">06</span> What to do about it</h2>
+  <h2><span class="num">06</span> What to do about it <span class="role-tag role-out">result</span></h2>
   <div class="h2rule"></div>
   <div class="sub two">
-    <p>Section 05 says what the plan costs. This one says what to buy. There are only two levers:
+    <p><strong>Read this:</strong> section 05 says what the plan costs. This one says what to buy. There are only two levers:
        purchase more credits, or move feature storage out of the credit model onto a Premium feature
        data store and pay a fixed subscription instead. Both are priced below against the same
        scenario, so the comparison is like for like.</p>
@@ -672,6 +778,8 @@ footer strong{color:var(--dim)}
   <h2><span class="num">07</span> Save, share, reuse</h2>
   <div class="h2rule"></div>
   <div class="sub two">
+    <p><strong>Do this:</strong> export the scenario if you will revisit it, copy the text summary if
+       it is going into an email or a proposal, and print if someone needs it on paper.</p>
     <p>Your scenario is kept in this browser automatically. Export it to a JSON file to version it
        with a project, send it to someone else, or come back to a comparison you ran months ago.
        Importing replaces everything currently on the page.</p>
@@ -693,7 +801,7 @@ footer strong{color:var(--dim)}
 
 <!-- 8 -->
 <section id="sec-reference">
-  <h2><span class="num">08</span> Published rates and reference values</h2>
+  <h2><span class="num">08</span> Published rates <span class="role-tag role-ref">reference</span></h2>
   <div class="h2rule"></div>
   <div class="sub one">
     <p>Esri's published credit consumption, used unchanged by this tool. It comes from Understand
@@ -722,6 +830,35 @@ footer strong{color:var(--dim)}
       </tbody></table>
     </div>
   </div>
+  <div class="panel" style="margin-top:16px">
+    <h3>How accurate is this</h3>
+    <p class="ph">Three things go into every number here, and they are not equally trustworthy. It is worth knowing which is which before you quote one.</p>
+    <table class="ref prose"><tbody>
+      <tr><td><strong>Published rates</strong><br><span style="color:var(--dim-2)">Esri's figures, used unchanged</span></td>
+          <td>Exact, until Esri changes them. Every rate links to its source above.</td></tr>
+      <tr><td><strong>Measured storage</strong><br><span style="color:var(--dim-2)">From an item report, or the Scope data script</span></td>
+          <td>Real megabytes. The only estimate left is how the content grows from here.</td></tr>
+      <tr><td><strong>Modeled storage</strong><br><span style="color:var(--dim-2)">From vertex and field counts, when nothing was measured</span></td>
+          <td>An engineering approximation, not an Esri figure. Treat it as a band.</td></tr>
+    </tbody></table>
+    <p style="font-size:12.5px;color:var(--dim);margin:15px 0 0">
+      The rate arithmetic has been checked against three production organizations by predicting
+      credit consumption from an item report and comparing it to the credit report for the same
+      period. Across 45 individual layers in two of them, predictions landed within about 5% of
+      actual consumption. Every item that missed by more than that was either created after the
+      billing period closed or is a layer the organization actively edits, so the gap is the content
+      changing between the snapshot and the bill, not the arithmetic. The third organization is on a
+      Premium feature data store, where feature storage leaves the credit model entirely; with
+      Premium selected in section 02 it lands within 8%.
+    </p>
+    <p style="font-size:12.5px;color:var(--dim);margin:12px 0 0">
+      So the honest expectation: if your content is stable, this should land within a few percent of
+      your bill. If it is growing, it will read high by roughly however much it grew. And if your
+      feature storage prediction is off by two orders of magnitude rather than a few percent, you are
+      on a Premium data store and have not told the tool yet.
+    </p>
+  </div>
+
   <div class="band" style="margin-top:16px">
     <strong>Four practical levers, in the order they usually pay off.</strong>
     Generalize the handful of dense shapes carrying your storage before you touch anything else.
@@ -762,6 +899,32 @@ footer strong{color:var(--dim)}
 </footer>
 
 </div>
+
+<div class="scrim noprint" id="glossScrim" onclick="closeGloss()"></div>
+<aside class="drawer noprint" id="glossDrawer" role="dialog" aria-modal="true"
+       aria-labelledby="glossTitle" aria-hidden="true">
+  <div class="drawer-hd">
+    <div>
+      <h3 id="glossTitle">Glossary</h3>
+      <p>The terms this tool uses, and why each one matters to what you are about to pay.</p>
+    </div>
+    <button class="drawer-x" onclick="closeGloss()" aria-label="Close">&times;</button>
+  </div>
+  <div class="drawer-body">
+    <dl class="gloss">
+        <div class="gl-t"><dt>Credit</dt><dd>The single currency for everything metered in ArcGIS Online. One credit is one credit whether it was spent on storage or on geocoding; what differs is how fast each thing consumes them. Credits arrive two ways: included with your user types each subscription year, or purchased in blocks.</dd></div>
+        <div class="gl-t"><dt>Storage versus transactions</dt><dd>The distinction that causes most credit surprises. Storage is rent: you pay every month for as long as the content exists, and it compounds as data grows. A transaction is a one-time charge for an action, such as saving a geocode result or generating tiles. A layer you host forever costs more than a bulk geocode you run once, even though the geocode looks alarming on the day.</dd></div>
+        <div class="gl-t"><dt>Feature storage</dt><dd>What hosted feature layers consume, billed at 2.4 credits per 10 MB per month. Per megabyte that is roughly 200 times the file storage rate, which is why feature layers dominate most organizations' storage bill and why vertex count matters so much.</dd></div>
+        <div class="gl-t"><dt>File storage</dt><dd>Everything that is stored as a file rather than as a queryable database table: attachments, documents, packages, tile caches, vector tiles, scene caches and offline areas. Billed at 1.2 credits per 1 GB per month. Imagery storage bills at the same rate.</dd></div>
+        <div class="gl-t"><dt>Feature data store</dt><dd>Where your hosted feature layers physically live. Standard is shared infrastructure billed with credits, capped at 500 GB. Premium is dedicated database compute at a fixed monthly subscription, sold in levels M2 through M4, and it removes feature storage from the credit model entirely.</dd></div>
+        <div class="gl-t"><dt>User type</dt><dd>The license assigned to each member, which determines both what they can do and how many credits your organization is granted each year. Creator, Professional and Professional Plus include 500 each; Mobile Worker and Contributor include 250; Viewer and Editor include none.</dd></div>
+        <div class="gl-t"><dt>Subscription year</dt><dd>Your renewal term, and the real planning unit. Included credits do not roll over: whatever you have not spent when the term ends is gone. That is why the cumulative chart in section 05 resets at each anniversary instead of running straight up.</dd></div>
+        <div class="gl-t"><dt>Credit block</dt><dd>How purchased credits are sold: blocks of 1,000, with no partial block. Purchased credits expire two years after purchase, so buying several years of headroom at once can cost more than it saves.</dd></div>
+        <div class="gl-t"><dt>Calculated hourly</dt><dd>Esri meters storage by the hour rather than by the month, so a layer deleted on the 10th stops costing you on the 10th. It also means an item created mid-month bills only for the part of the month it existed.</dd></div>
+        <div class="gl-t"><dt>Modeled size</dt><dd>The size column in section 03 when a row has no measurement behind it. Esri publishes credits per megabyte but not megabytes per feature, so the tool estimates from vertex count, field count and overhead. Rows built from an item report are marked measured and skip the model entirely.</dd></div>
+    </dl>
+  </div>
+</aside>
 
 <div class="scrim noprint" id="scopeScrim" onclick="closeScope()"></div>
 <aside class="drawer noprint" id="scopeDrawer" role="dialog" aria-modal="true"
@@ -1457,7 +1620,7 @@ function renderAdvice(yearStd, yearNoFeat, months, price, avail, featMB1){
 /* Parsed in the browser and held in memory only. Never written to localStorage,
    never included in an exported scenario, gone on reload. Item reports carry
    titles and owner names, so they are treated as the user's data, not ours. */
-let ORG = null;
+let ORG = null, MEMBERS = null;
 
 /* RFC 4180 style reader: handles quoted fields, embedded commas and newlines,
    doubled quotes, CRLF and a UTF-8 BOM. */
@@ -1510,6 +1673,46 @@ function mapHeaders(hdr){
 const cell = (r,i) => (i === undefined || r[i] === undefined) ? "" : String(r[i]).trim();
 const cnum = (r,i) => { const n = parseFloat(cell(r,i).replace(/,/g,"")); return isFinite(n) ? n : 0; };
 const cbool = (r,i) => /^(true|yes|y|1)$/i.test(cell(r,i));
+
+/* One drop zone, three possible reports. Guessing by filename is unreliable, so
+   the header decides. */
+function detectReport(text){
+  const rows = parseCSV(text.slice(0, 8000));
+  for(let i = 0; i < Math.min(rows.length, 8); i++){
+    const h = rows[i].map(norm);
+    if(h.indexOf("creditsconsumedby") !== -1 || h.indexOf("starttime") !== -1) return "credits";
+    if(h.indexOf("usertype") !== -1 && h.indexOf("username") !== -1) return "members";
+    if(h.indexOf("filestoragesize") !== -1 || h.indexOf("featurestoragesize") !== -1) return "items";
+  }
+  return null;
+}
+
+const USER_TYPE_MAP = {
+  "creator":"creator", "professional":"professional", "professionalplus":"proplus",
+  "mobileworker":"mobile", "fieldworker":"mobile", "contributor":"contributor",
+  "viewer":"editor", "editor":"editor", "storytellermaps":"editor", "insightsanalyst":"creator"
+};
+function parseMemberReport(text){
+  const rows = parseCSV(text);
+  if(rows.length < 2) return {error:"That member report has no data rows."};
+  const head = rows[0].map(norm);
+  const iType = head.indexOf("usertype"), iName = head.indexOf("username");
+  const iStatus = head.indexOf("memberaccountstatus");
+  if(iType === -1) return {error:"No User Type column found. Is this a member report?"};
+  const counts = {creator:0, professional:0, proplus:0, mobile:0, contributor:0, editor:0};
+  const raw = {}; let n = 0, unknown = 0, disabled = 0;
+  for(let i = 1; i < rows.length; i++){
+    const r = rows[i];
+    if(!r.length || (iName !== -1 && !String(r[iName]||"").trim())) continue;
+    n++;
+    if(iStatus !== -1 && /disabled/i.test(String(r[iStatus]||""))) disabled++;
+    const label = String(r[iType]||"").trim();
+    raw[label] = (raw[label]||0) + 1;
+    const k = USER_TYPE_MAP[norm(label)];
+    if(k) counts[k]++; else unknown++;
+  }
+  return {counts:counts, raw:raw, n:n, unknown:unknown, disabled:disabled};
+}
 
 function parseItemReport(text){
   const rows = parseCSV(text);
@@ -1595,8 +1798,24 @@ function orgRead(f){
   if(!/\.csv$/i.test(f.name)){ orgFlash("That is not a .csv file."); return; }
   const rd = new FileReader();
   rd.onload = ()=>{
+    const text = String(rd.result);
+    let kind;
+    try{ kind = detectReport(text); }
+    catch(e){ orgFlash("That file could not be read as a CSV."); return; }
+
+    if(kind === "credits"){
+      orgFlash("That is a credit report. Use it to check the numbers below by hand; this panel reads the item report and the member report.");
+      return;
+    }
+    if(kind === "members"){
+      const m = parseMemberReport(text);
+      if(m.error){ orgFlash(m.error); return; }
+      MEMBERS = m; MEMBERS.fileName = f.name;
+      renderMembers();
+      return;
+    }
     let res;
-    try{ res = parseItemReport(String(rd.result)); }
+    try{ res = parseItemReport(text); }
     catch(e){ orgFlash("That file could not be read as a CSV."); return; }
     if(res.error){ orgFlash(res.error); return; }
     if(!res.items.length){ orgFlash("No item rows found in that file."); return; }
@@ -1613,6 +1832,48 @@ function orgFlash(m){
   e.style.color = "var(--bad)"; e.textContent = m;
   clearTimeout(orgFlash.t); orgFlash.t = setTimeout(()=>{ e.textContent = ""; }, 6000);
 }
+function renderMembers(){
+  const m = MEMBERS; if(!m) return;
+  const box = document.getElementById("orgMembers");
+  const msg = document.getElementById("orgMsg");
+  msg.style.color = "var(--good)";
+  msg.textContent = m.fileName + ": " + fmt(m.n,0) + " members read.";
+  box.hidden = false;
+  document.getElementById("sec-org").classList.remove("noprint");
+  let inc = 0;
+  const rows = USER_TYPES.map(([k,label,cr])=>{
+    const c = m.counts[k]||0; inc += c*cr;
+    return '<tr><td>'+label+'</td><td class="num">'+fmt(c,0)+'</td><td class="num">'
+         + (cr ? fmt(c*cr,0) : '<span style="color:var(--dim-2)">0</span>')+'</td></tr>';
+  }).join("");
+  document.getElementById("memberTable").innerHTML =
+    '<tr><th>User type</th><th class="num">Members</th><th class="num">Included credits / year</th></tr>'
+    + rows
+    + '<tr><td style="font-weight:650;border-top:1px solid var(--accent)">Total</td>'
+    + '<td class="num" style="font-weight:650;border-top:1px solid var(--accent)">'+fmt(m.n,0)+'</td>'
+    + '<td class="num" style="font-weight:650;border-top:1px solid var(--accent)">'+fmt(inc,0)+'</td></tr>';
+  document.getElementById("memberNote").textContent =
+    (m.unknown ? m.unknown + " member" + (m.unknown>1?"s":"") + " had a user type this tool does not map, so they count as zero included credits. " : "")
+    + (m.disabled ? m.disabled + " account" + (m.disabled>1?"s are":" is") + " disabled but still holds a license. " : "")
+    + "Applying this overwrites the user type counts in section 02.";
+  MEMBERS.included = inc;
+}
+function applyMembers(){
+  if(!MEMBERS) return;
+  USER_TYPES.forEach(([k])=>{ S.users[k] = MEMBERS.counts[k]||0; });
+  S.supply.useBalance = false;
+  buildControls(); calc(); save();
+  document.getElementById("sec-supply").scrollIntoView({behavior:"smooth", block:"start"});
+  const msg = document.getElementById("orgMsg");
+  msg.style.color = "var(--good)";
+  msg.textContent = "User type counts applied to section 02: " + fmt(MEMBERS.included,0) + " included credits a year.";
+}
+function membersClear(){
+  MEMBERS = null;
+  document.getElementById("orgMembers").hidden = true;
+  document.getElementById("orgMsg").textContent = "";
+}
+
 function orgClear(){
   ORG = null;
   document.getElementById("orgOut").hidden = true;
@@ -1684,43 +1945,62 @@ function renderOrg(){
   if(rec){
     rec.innerHTML = "<strong>Check this against your credit report.</strong> Pull a monthly credit"
       + " report for the same period and compare its org-level storage rows against "
-      + fmt(cred,0) + " credits a month. If the actual feature storage figure is a tiny fraction of "
-      + fmt(o.featMB/10*RATE.featurePer10MB,0) + ", the org is on a Premium feature data store and"
-      + " you should select it in section 02, which takes feature storage out of the credit model here."
+      + fmt(cred,0) + " credits a month. Two things to expect. An item report is a point-in-time"
+      + " snapshot and a credit report is a period, so anything edited in between shows up as a gap;"
+      + " on a quiet organization this lands within about 1%, and on one with actively edited layers"
+      + " it runs high by whatever those layers grew. But if actual feature storage is a tiny"
+      + " fraction of " + fmt(o.featMB/10*RATE.featurePer10MB,0)
+      + " rather than merely close to it, that is not drift. It means feature storage has left the"
+      + " credit model, so the organization is on a Premium feature data store and you should select"
+      + " it in section 02."
       + (prem ? " Premium is currently selected, so feature storage is excluded above." : "");
   }
 }
 
-/* ---------- scope drawer ---------- */
-let scopeReturn = null;
-function scopeOpen(){ return document.getElementById("scopeDrawer").classList.contains("on"); }
-function openScope(){
-  const d = document.getElementById("scopeDrawer"), sc = document.getElementById("scopeScrim");
-  if(!d || scopeOpen()) return;
-  scopeReturn = document.activeElement;
+/* ---------- drawers ---------- */
+/* Two drawers share one implementation: the scope panel and the glossary. */
+let drawerReturn = null;
+function openDrawer(id, scrimId, focusId){
+  const d = document.getElementById(id), sc = document.getElementById(scrimId);
+  if(!d || d.classList.contains("on")) return;
+  drawerReturn = document.activeElement;
   d.classList.add("on"); sc.classList.add("on");
   d.setAttribute("aria-hidden","false");
   document.body.style.overflow = "hidden";
   d.querySelector(".drawer-body").scrollTop = 0;
-  const t = document.getElementById("measIn");
-  // preventScroll keeps the drawer at the top instead of jumping to step 2 on narrow screens
-  if(t) setTimeout(()=>{ try{ t.focus({preventScroll:true}); }catch(e){ t.focus(); } }, 230);
+  const t = focusId && document.getElementById(focusId);
+  // preventScroll keeps the drawer at the top instead of jumping to its focused control
+  setTimeout(()=>{
+    const el = t || d.querySelector(".drawer-x");
+    if(el){ try{ el.focus({preventScroll:true}); }catch(e){ el.focus(); } }
+  }, 230);
 }
-function closeScope(){
-  const d = document.getElementById("scopeDrawer"), sc = document.getElementById("scopeScrim");
-  if(!d || !scopeOpen()) return;
+function closeDrawer(id, scrimId){
+  const d = document.getElementById(id), sc = document.getElementById(scrimId);
+  if(!d || !d.classList.contains("on")) return;
   d.classList.remove("on"); sc.classList.remove("on");
   d.setAttribute("aria-hidden","true");
   document.body.style.overflow = "";
-  if(scopeReturn && scopeReturn.focus) scopeReturn.focus();
-  scopeReturn = null;
+  if(drawerReturn && drawerReturn.focus) drawerReturn.focus();
+  drawerReturn = null;
 }
+function openDrawers(){ return [...document.querySelectorAll(".drawer.on")]; }
+function scopeOpen(){ return document.getElementById("scopeDrawer").classList.contains("on"); }
+function openScope(){ openDrawer("scopeDrawer","scopeScrim","measIn"); }
+function closeScope(){ closeDrawer("scopeDrawer","scopeScrim"); }
+function openGloss(){ openDrawer("glossDrawer","glossScrim"); }
+function closeGloss(){ closeDrawer("glossDrawer","glossScrim"); }
 document.addEventListener("keydown", e=>{
-  if(e.key === "Escape" && scopeOpen()){ e.preventDefault(); closeScope(); return; }
-  if(e.key !== "Tab" || !scopeOpen()) return;
-  // keep tabbing inside the drawer while it is open
-  const f = document.getElementById("scopeDrawer").querySelectorAll(
-    'button, textarea, input, a[href], [tabindex]:not([tabindex="-1"])');
+  const open = openDrawers()[0];
+  if(!open) return;
+  if(e.key === "Escape"){
+    e.preventDefault();
+    closeDrawer(open.id, open.id === "glossDrawer" ? "glossScrim" : "scopeScrim");
+    return;
+  }
+  if(e.key !== "Tab") return;
+  // keep tabbing inside whichever drawer is open
+  const f = open.querySelectorAll('button, textarea, input, a[href], [tabindex]:not([tabindex="-1"])');
   if(!f.length) return;
   const first = f[0], last = f[f.length-1];
   if(e.shiftKey && document.activeElement === first){ e.preventDefault(); last.focus(); }
@@ -2054,6 +2334,21 @@ function flash(m){
   ["dragover","drop"].forEach(ev=>window.addEventListener(ev, e=>{
     if(!d.contains(e.target)) e.preventDefault();
   }));
+})();
+
+/* ---------- section nav highlight ---------- */
+(function(){
+  const links = [...document.querySelectorAll(".secnav a[href^='#sec-']")];
+  if(!links.length || !("IntersectionObserver" in window)) return;
+  const byId = {};
+  links.forEach(a=>{ byId[a.getAttribute("href").slice(1)] = a; });
+  const seen = new Set();
+  const io = new IntersectionObserver(es=>{
+    es.forEach(e=>{ e.isIntersecting ? seen.add(e.target.id) : seen.delete(e.target.id); });
+    const first = links.map(a=>a.getAttribute("href").slice(1)).filter(id=>seen.has(id))[0];
+    links.forEach(a=>a.classList.toggle("on", a.getAttribute("href").slice(1) === first));
+  }, {rootMargin:"-60px 0px -70% 0px"});
+  Object.keys(byId).forEach(id=>{ const el = document.getElementById(id); if(el) io.observe(el); });
 })();
 
 /* ---------- boot ---------- */
