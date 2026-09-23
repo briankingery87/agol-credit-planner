@@ -11,12 +11,14 @@ const {chromium} = require('playwright');
     const addRow = o => { rows.push(Object.assign(
       {id:++uid,name:'r'+uid,type:'feature',feat:0,vert:1,attr:0,gb:0,sync:false,growth:0,mb:0}, o)); };
     // BK's scenario, from the screenshots
-    addRow({name:'Parcels one county',   type:'feature', feat:45000,  vert:24, attr:50});
-    addRow({name:'Parcels multi-county', type:'feature', feat:900000, vert:24, attr:28});
-    addRow({name:'Imagery 5,000 GB',     type:'imagery', gb:5000});
-    addRow({name:'File 50 GB',           type:'file',    gb:50});
-    addRow({name:'Imagery 99,150 GB',    type:'imagery', gb:99150});
-    S.supply.months = 12; S.supply.price = 0.12;
+    addRow({name:'Imagery or tile cache', type:'imagery', gb:25000});
+    addRow({name:'Parcels, one county',   type:'feature', feat:450000, vert:24, attr:48});
+    addRow({name:'New layer',             type:'imagery', gb:500, growth:5});
+    addRow({name:'New layer',             type:'feature', feat:910000, vert:50, attr:15});
+    addRow({name:'New layer',             type:'file',    gb:500});
+    S.supply.months = 60; S.supply.price = 0.12;
+    S.users.creator = 7; S.users.pro = 1; S.users.editor = 5;
+    S.supply.useBalance = true; S.supply.balance = 50000;
     buildControls(); drawRows(); calc();
     const s0 = chartData.series[0];
     const avail = availableAnnual();

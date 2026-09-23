@@ -1629,6 +1629,11 @@ function calc(){
   spend.featShare = spend.grand > 0 ? totF/spend.grand : 0;
   spend.biggestOther = [["file storage", totFl], ["imagery storage", totIm],
                         ["transactions", totT]].sort((a,b)=>b[1]-a[1])[0];
+  /* Premium is quoted per month, so the honest comparison against it is the
+     month-1 credit burn, not the horizon total. Carrying both stops the advice
+     from putting a 60-month number next to a monthly subscription price. */
+  spend.mo1 = {feature:series[0].f, file:series[0].fl, imagery:series[0].im,
+               transactions:series[0].t, grand:series[0].total};
 
   renderTiers(stdCost, months, price, featMB1, spend);
   renderAdvice(yearStd, yearNoFeat, months, price, avail, featMB1, spend);
@@ -1698,7 +1703,9 @@ function renderTiers(stdCost, months, price, featMB1, spend){
   });
 
   const where = "You are modeling " + fmtSize(featMB1) + " of feature data, "
-    + fmt(stdCred,0) + " credits and about " + money(stdCost) + " over " + months + " months on Standard. ";
+    + fmt(stdCred,0) + " credits and about " + money(stdCost) + " over " + months + " months on Standard"
+    + (spend && spend.mo1 ? ", or " + money(spend.mo1.feature*price,2) + " a month against "
+        + money(TIERS[0][3]) + " a month for M2" : "") + ". ";
   let verdict;
   if(featGB > 500){
     verdict = "That is past the 500 GB ceiling on a Standard feature data store, so Premium is required rather than optional"
@@ -1834,6 +1841,21 @@ function renderAdvice(yearStd, yearNoFeat, months, price, avail, featMB1, spend)
       .filter(x=>x[1] > 0).sort((a,b)=>b[1]-a[1])
       .map(x=>x[0] + " " + fmt(x[1]/spend.grand*100,0) + "%");
     bullets.push("What is driving it: " + parts.join(", ") + ".");
+  }
+  /* The monthly subscription price invites a direct comparison against the
+     monthly bill, and that comparison is the one people actually make. Make it
+     for them, against the only part of the bill Premium can touch. */
+  if(win.key === "std" && spend && spend.mo1 && spend.mo1.grand > 0){
+    const m2mo   = TIERS[0][3];
+    const featMo = spend.mo1.feature*price;
+    const beGB   = (m2mo/Math.max(price,0.0001))/RATE.featurePer10MB*10/1024;
+    bullets.push("Compare it per month, like for like: <strong>" + money(featMo,2)
+      + "</strong> of feature storage today against <strong>" + money(m2mo)
+      + "</strong> for M2. Your total bill is " + money(spend.mo1.grand*price,2)
+      + " a month, but Premium only replaces the feature storage part of it."
+      + " Imagery, tile caches, file items and transactions bill the same on every data store."
+      + " M2 breaks even at about " + fmt(beGB,0) + " GB of feature data; you are modeling "
+      + fmtSize(featMB1) + ".");
   }
   if(win.key === "std" && spend && spend.featShare < 0.25 && spend.grand > 0){
     const removes = spend.feature*price;

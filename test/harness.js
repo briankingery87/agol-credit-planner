@@ -225,6 +225,15 @@ const {chromium} = require('playwright');
       /does not replace the credit purchase/i.test(imgV));
     truthy('note tells the reader to read Premium rows as plus, not instead',
       /not instead of them/i.test(document.getElementById('advNote').textContent));
+    /* BK read the monthly subscription price against the monthly total bill and
+       expected M2 to win. The advice has to make that same comparison against the
+       only slice Premium can remove, in dollars per month. */
+    truthy('advice compares per month, like for like', /per month, like for like/i.test(imgV));
+    truthy('advice names what Premium cannot touch',
+      /bill the same on every data store/i.test(imgV));
+    truthy('advice gives the feature-storage break-even in GB', /breaks even at about/i.test(imgV));
+    truthy('premium panel quotes a monthly figure against a monthly price',
+      /a month against .* a month for M2/i.test(imgP));
 
     // and the opposite case still recommends moving
     reset();
